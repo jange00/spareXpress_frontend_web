@@ -1,6 +1,6 @@
 import { Outlet } from 'react-router-dom';
-import TopNavigationBar from '../components/navBar/TopNavigationBar';
 import Footer from '../components/footer/Footer';
+import TopNavigationBar from '../components/navBar/top_navigationBar';
 
 
 const AppLayout = () => (

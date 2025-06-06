@@ -5,6 +5,8 @@ import LandingPage from "../pages/LandingPage";
 import ProductsListingPage from "../pages/ProductListingPage";
 import ProductDetailsPage from "../pages/ProductDetailsPage";
 import CheckoutPage from "../components/checkout/checkout";
+import SignInPage from "../pages/signInPage";
+import SignUpPage from "../pages/signUpPage";
 
 
 export const router = createBrowserRouter([
@@ -13,8 +15,8 @@ export const router = createBrowserRouter([
     errorElement: <NotFound />,
     children: [
       { path: "/", element: <LandingPage /> },
-      // { path: "/sign-in", element: <SignInPage /> },
-      // { path: "/sign-up", element: <SignUpPage /> },
+      { path: "/sign-in", element: <SignInPage /> },
+      { path: "/sign-up", element: <SignUpPage /> },
       { path: "/products", element: <ProductsListingPage/>},
       { path: "/categories/:category", element: <ProductsListingPage /> },
       { path: "/vehicle/:subcategory", element: <ProductsListingPage /> },

@@ -7,6 +7,10 @@ import ProductDetailsPage from "../pages/ProductDetailsPage";
 import CheckoutPage from "../components/checkout/checkout";
 import SignInPage from "../pages/signInPage";
 import SignUpPage from "../pages/signUpPage";
+import BestSellingProducts from "../components/LandingPageComponents/bestSelling/BestSellingProducts.js";
+import DiscountOffers from "../components/LandingPageComponents/offerDiscountSection/DiscountOffers.jsx";
+import AdminDashboard from "../pages/admin/adminDashboard.jsx";
+import AdminLayout from "../layouts/adminLayout.jsx";
 
 
 export const router = createBrowserRouter([
@@ -22,9 +26,25 @@ export const router = createBrowserRouter([
       { path: "/vehicle/:subcategory", element: <ProductsListingPage /> },
       { path: "/computer/:subcategory", element: <ProductsListingPage /> },
       { path: "/product/:productId", element: <ProductDetailsPage /> },
-      // { path: "/best-sellers", element: <BestSellingProducts/> },
-      // { path: "/deals", element: <DiscountOffers/> },
+      { path: "/best-sellers", element: <BestSellingProducts/> },
+      { path: "/deals", element: <DiscountOffers/> },
       { path: "/checkout", element: <CheckoutPage/> },
+    ],
+  },
+
+  {
+    element: <AdminLayout />, // Admin layout for admin dashboard routes
+    children: [
+      { path: "/admin/dashboard", element: <AdminDashboard /> }, 
+      // { path: "/admin/products", element: <ProductManagement/> },
+      // { path: "/admin/orders", element: <OrderManagement/> },
+      // { path: "/admin/users", element: <UserManagement/> },
+      // { path: "/admin/inventory", element: <InventoryManagement/> },
+      // { path: "/admin/payments", element: <PaymentManagement/> },
+      // { path: "/admin/reports", element: <ReportingDashboard/> },
+      // { path: "/admin/delivery", element: <DeliveryManagement/> },
+      // { path: "/admin/settings", element: <SettingsPage/> },
+      
     ],
   },
 ]);

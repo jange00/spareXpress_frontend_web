@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { Filter } from "lucide-react"
-import { useProducts } from "../hook/use-products"
+import { useProducts } from "../hook/useProducts"
 import { FilterSidebar } from "../components/productListingComponent/filterSidebar"
 import { MobileFiltersModal } from "../components/productListingComponent/mobileFiltersModal"
 import { ProductGrid } from "../components/productListingComponent/productGrid"

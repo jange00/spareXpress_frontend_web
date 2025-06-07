@@ -11,6 +11,7 @@ import BestSellingProducts from "../components/LandingPageComponents/bestSelling
 import DiscountOffers from "../components/LandingPageComponents/offerDiscountSection/DiscountOffers.jsx";
 import AdminDashboard from "../pages/admin/adminDashboard.jsx";
 import AdminLayout from "../layouts/adminLayout.jsx";
+import ProductManagement from "../components/admin/ProductManagement/productManagement.jsx";
 
 
 export const router = createBrowserRouter([
@@ -36,7 +37,7 @@ export const router = createBrowserRouter([
     element: <AdminLayout />, // Admin layout for admin dashboard routes
     children: [
       { path: "/admin/dashboard", element: <AdminDashboard /> }, 
-      // { path: "/admin/products", element: <ProductManagement/> },
+      { path: "/admin/products", element: <ProductManagement/> },
       // { path: "/admin/orders", element: <OrderManagement/> },
       // { path: "/admin/users", element: <UserManagement/> },
       // { path: "/admin/inventory", element: <InventoryManagement/> },

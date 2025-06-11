@@ -2,4 +2,4 @@ import { data } from "react-router";
 import axios from "./api";
 
 export const registerUserApi = (data) => axios.post("/auth/register", data)
-// export const loginUserApi = (data) => axios.post("/auth/login", data)
+export const loginUserApi = (data) => axios.post("/auth/login", data)

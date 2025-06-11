@@ -2,7 +2,7 @@ import { createContext, useState, useEffect, Children, use } from "react";
 
 export const AuthContext = createContext()
 const AuthContextProvider = ({ Children }) => {
-    const [user, setUser] = useState[null]
+    const [user, setUser] = useState(null)
     const [loading, setLoading] = useState(true)
     const login = (userData, token) => {
         setLoading(true)

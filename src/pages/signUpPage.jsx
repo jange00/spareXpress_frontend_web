@@ -14,32 +14,29 @@ import ErrorMessage from "../components/authComponents/signUp/errorMessage"
 import { passwordRequirements, calculatePasswordStrength } from "../components/authComponents/signUp/passwordUtils"
 import { countryCodes } from "../components/authComponents/signUp/countryCodes"
 
+import { useRegisterUserTan } from "../hook/useRegisterUserTan"
+
 const SignUpPage = () => {
+  const { mutate, data, isPending, isSuccess, isError, error: mutationError } = useRegisterUserTan()
+
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
-    phone: "",
+    phoneNumber: "",
     countryCode: "+1",
     password: "",
-    confirmPassword: "",
+    confirmPassword: "", 
     profilePicture: null,
-    // street: "",
-    // city: "",
-    // state: "",
-    // zipCode: "",
-    // country: "",
-    termsAccepted: false,
+    termsAccepted: false, 
   })
 
   const [passwordStrength, setPasswordStrength] = useState(0)
-  const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
   const [profilePreview, setProfilePreview] = useState(null)
 
   const handlePasswordChange = (e) => {
     const password = e.target.value
     setFormData({ ...formData, password })
-    // Calculate password strength
     setPasswordStrength(calculatePasswordStrength(password, passwordRequirements))
   }
 
@@ -55,29 +52,74 @@ const SignUpPage = () => {
     }
   }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    if (!formData.termsAccepted) {
-      setError("Please accept the terms and conditions")
-      return
+  // Fixed: Add form validation
+  const validateForm = () => {
+    if (!formData.fullName.trim()) {
+      setError("Full name is required")
+      return false
+    }
+    if (!formData.email.trim()) {
+      setError("Email is required")
+      return false
+    }
+    if (!formData.phoneNumber.trim()) {
+      setError("Phone number is required")
+      return false
+    }
+    if (!formData.password) {
+      setError("Password is required")
+      return false
     }
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match")
+      return false
+    }
+    if (!formData.termsAccepted) {
+      setError("Please accept the terms and conditions")
+      return false
+    }
+    return true
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setError("")
+
+    if (!validateForm()) {
       return
     }
-    setError("")
-    setIsLoading(true)
-    try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-      console.log("Sign up attempt with:", formData)
-      // Handle successful signup
-    } catch (error) {
-      setError("An error occurred. Please try again.")
-    } finally {
-      setIsLoading(false)
+
+
+    const request = new FormData()
+    request.append("fullname", formData.fullName)
+    request.append("email", formData.email)
+    request.append("phoneNumber", formData.phoneNumber)
+    request.append("countryCode", formData.countryCode)
+    request.append("password", formData.password)
+    
+
+    if (formData.profilePicture) {
+      request.append("profilePicture", formData.profilePicture)
     }
+
+    
+    mutate(request, {
+      onSuccess: (data) => {
+        console.log("Registration successful:", data)
+        
+      },
+      onError: (error) => {
+        console.error("Registration failed:", error)
+        setError(error.message || "Registration failed. Please try again.")
+      }
+    })
   }
+
+  
+  const isLoading = isPending
+
+
+  const displayError = error || (mutationError?.message)
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
@@ -87,7 +129,7 @@ const SignUpPage = () => {
         {/* Main Form */}
         <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
           <form onSubmit={handleSubmit} className="space-y-6">
-            <ErrorMessage error={error} />
+            <ErrorMessage error={displayError} />
 
             <ProfilePictureUpload
               profilePreview={profilePreview}
@@ -104,6 +146,7 @@ const SignUpPage = () => {
                 value={formData.fullName}
                 onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                 icon={User}
+                required
               />
 
               {/* Email */}
@@ -114,19 +157,27 @@ const SignUpPage = () => {
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 icon={Mail}
+                required
               />
 
               {/* Phone Number */}
               <PhoneInput
                 countryCode={formData.countryCode}
                 onCountryCodeChange={(e) => setFormData({ ...formData, countryCode: e.target.value })}
-                phone={formData.phone}
-                onPhoneChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                phoneNumber={formData.phoneNumber}
+                onPhoneChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
                 countryCodes={countryCodes}
+                required
               />
 
               {/* Password */}
-              <PasswordInput id="password" label="Password" value={formData.password} onChange={handlePasswordChange} />
+              <PasswordInput 
+                id="password" 
+                label="Password" 
+                value={formData.password} 
+                onChange={handlePasswordChange}
+                required
+              />
 
               {/* Confirm Password */}
               <PasswordInput
@@ -134,6 +185,7 @@ const SignUpPage = () => {
                 label="Confirm Password"
                 value={formData.confirmPassword}
                 onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                required
               />
             </div>
 

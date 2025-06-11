@@ -1,10 +1,17 @@
-import { useState } from "react"
+import { useContext, useState } from "react"
 import { Logo } from "../components/authComponents/login/logo"
 import { LoginMethodSelector } from "../components/authComponents/login/loginMethodSelector"
 import { SignInForm } from "../components/authComponents/login/signInForm"
+// import { data, useNavigate } from "react-router"
+// import { AuthContext } from "../auth/AuthProvider"
+// import { useLoginUserTan } from "../hook/useLoginUserTan"
 
 const SignInPage = () => {
   const [loginMethod, setLoginMethod] = useState("email")
+  //
+  // const navigate = useNavigate()
+  // const { login } = useContext(AuthContext)
+  // const {mutate, isPending, isError, error} = useLoginUserTan
 
   const handleMethodChange = (method) => {
     setLoginMethod(method)
@@ -12,6 +19,17 @@ const SignInPage = () => {
 
   const handleFormSubmit = (formData) => {
     console.log("Sign in attempt with:", formData)
+    //
+    // mutate(formData, {
+    //   onSuccess: (data) => {
+    //     login(data.user, data.token)
+    //     navigate("/")
+    //   }, 
+    //   onError: (err) => {
+    //     console.log("Login failed", err)
+    //     alert(typeof err ==="string"? err: "Login Failed. Please try again")
+    //   }
+    // })
   }
 
   return (

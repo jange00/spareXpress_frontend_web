@@ -8,7 +8,7 @@ import { SocialLogin } from "./socialLogin"
 export const SignInForm = ({ loginMethod, onSubmit }) => {
   const [rememberMe, setRememberMe] = useState(false)
   const [formData, setFormData] = useState({
-    emailOrPhone: loginMethod === "phone" ? "+977 " : "",
+    identifier:  "",
     password: "",
   })
   const [error, setError] = useState("")
@@ -24,12 +24,12 @@ export const SignInForm = ({ loginMethod, onSubmit }) => {
       value = `+977 ${digitsOnly}`
     }
 
-    setFormData({ ...formData, emailOrPhone: value })
+    setFormData({ ...formData, identifier: value })
   }
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    if (!formData.emailOrPhone || !formData.password) {
+    if (!formData.identifier || !formData.password) {
       setError("Please fill in all fields.")
       return
     }
@@ -48,11 +48,11 @@ export const SignInForm = ({ loginMethod, onSubmit }) => {
 
       {/* Email/Phone Input */}
       <FormInput
-        id="emailOrPhone"
+        id="identifier"
         type={loginMethod === "email" ? "email" : "tel"}
         label={loginMethod === "email" ? "Email Address" : "Phone Number"}
         placeholder={loginMethod === "email" ? "Enter your email" : "+977 XXXXXXXX"}
-        value={formData.emailOrPhone}
+        value={formData.identifier}
         onChange={handleInputChange}
         required
       />

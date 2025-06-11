@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react"
-import ActionBar from "./actionBar"
-import FilterBar from "./filterBar"
-import ProductTable from "./productTable"
-import ProductModal from "./productModal"
-import BulkActionModal from "./bulkActionModal"
-import { initialProducts } from "./sampleData"
+import ActionBar from "../../components/admin/productManagement/actionBar"
+import FilterBar from "../../components/admin/productManagement/filterBar"
+import ProductTable from "../../components/admin/productManagement/productTable"
+import ProductModal from "../../components/admin/productManagement/productModal"
+import BulkActionModal from "../../components/admin/productManagement/bulkActionModal"
+import { initialProducts } from "../../components/admin/productManagement/sampleData"
 
 const ProductManagement = () => {
   // State management

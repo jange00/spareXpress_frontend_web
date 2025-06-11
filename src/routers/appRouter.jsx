@@ -9,9 +9,13 @@ import SignInPage from "../pages/signInPage";
 import SignUpPage from "../pages/signUpPage";
 import BestSellingProducts from "../components/LandingPageComponents/bestSelling/BestSellingProducts.js";
 import DiscountOffers from "../components/LandingPageComponents/offerDiscountSection/DiscountOffers.jsx";
-import AdminDashboard from "../pages/admin/adminDashboard.jsx";
 import AdminLayout from "../layouts/adminLayout.jsx";
-import ProductManagement from "../components/admin/ProductManagement/productManagement.jsx";
+import ProductManagement from "../pages/admin/productManagementPage.jsx";
+import AdminDashboard from "../pages/admin/adminDashboardPage.jsx";
+import OrderManagement from "../pages/admin/orderManagementPage.Jsx";
+
+
+
 
 
 export const router = createBrowserRouter([
@@ -38,7 +42,7 @@ export const router = createBrowserRouter([
     children: [
       { path: "/admin/dashboard", element: <AdminDashboard /> }, 
       { path: "/admin/products", element: <ProductManagement/> },
-      // { path: "/admin/orders", element: <OrderManagement/> },
+      { path: "/admin/orders", element: <OrderManagement/>}
       // { path: "/admin/users", element: <UserManagement/> },
       // { path: "/admin/inventory", element: <InventoryManagement/> },
       // { path: "/admin/payments", element: <PaymentManagement/> },

@@ -106,6 +106,16 @@ const SignUpPage = () => {
     mutate(request, {
       onSuccess: (data) => {
         console.log("Registration successful:", data)
+        setFormData({
+          fullName: "",
+          email: "",
+          phoneNumber: "",
+          countryCode: "+1",
+          password: "",
+          confirmPassword: "", 
+          profilePicture: null,
+          termsAccepted: false, 
+        })
         
       },
       onError: (error) => {

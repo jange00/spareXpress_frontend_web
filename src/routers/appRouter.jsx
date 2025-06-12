@@ -14,6 +14,7 @@ import ProductManagement from "../pages/admin/productManagementPage.jsx";
 import AdminDashboard from "../pages/admin/adminDashboardPage.jsx";
 import OrderManagement from "../pages/admin/orderManagementPage.Jsx";
 import UserManagement from "../pages/admin/userManagementPage.jsx";
+import PaymentManagement from "../pages/admin/paymentManagementPage.jsx";
 
 
 
@@ -44,9 +45,7 @@ export const router = createBrowserRouter([
       { path: "/admin/dashboard", element: <AdminDashboard /> }, 
       { path: "/admin/products", element: <ProductManagement/> },
       { path: "/admin/orders", element: <OrderManagement/>},
-
       { path: "/admin/users", element: <UserManagement/> },
-
       // { path: "/admin/inventory", element: <InventoryManagement/> },
       { path: "/admin/payments", element: <PaymentManagement/> },
       // { path: "/admin/reports", element: <ReportingDashboard/> },

@@ -13,6 +13,7 @@ import AdminLayout from "../layouts/adminLayout.jsx";
 import ProductManagement from "../pages/admin/productManagementPage.jsx";
 import AdminDashboard from "../pages/admin/adminDashboardPage.jsx";
 import OrderManagement from "../pages/admin/orderManagementPage.Jsx";
+import PaymentManagement from "../pages/admin/paymentManagementPage.jsx";
 
 
 
@@ -42,10 +43,10 @@ export const router = createBrowserRouter([
     children: [
       { path: "/admin/dashboard", element: <AdminDashboard /> }, 
       { path: "/admin/products", element: <ProductManagement/> },
-      { path: "/admin/orders", element: <OrderManagement/>}
+      { path: "/admin/orders", element: <OrderManagement/>},
       // { path: "/admin/users", element: <UserManagement/> },
       // { path: "/admin/inventory", element: <InventoryManagement/> },
-      // { path: "/admin/payments", element: <PaymentManagement/> },
+      { path: "/admin/payments", element: <PaymentManagement/> },
       // { path: "/admin/reports", element: <ReportingDashboard/> },
       // { path: "/admin/delivery", element: <DeliveryManagement/> },
       // { path: "/admin/settings", element: <SettingsPage/> },

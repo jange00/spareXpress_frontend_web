@@ -17,6 +17,7 @@ const SignInPage = () => {
   }
 
   const handleFormSubmit = (formData) => {
+    console.log(formData)
     mutate(formData, {
       onSuccess: (res) => {
         // login(res.user, res.token)

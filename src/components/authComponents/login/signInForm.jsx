@@ -16,18 +16,11 @@ export const SignInForm = ({ loginMethod, onSubmit }) => {
   const handleInputChange = (e) => {
     let value = e.target.value
 
-    if (loginMethod === "phone") {
-      if (!value.startsWith("+977 ")) {
-        value = "+977 "
-      }
-      const digitsOnly = value.replace(/\D/g, "").slice(3, 13)
-      value = `+977 ${digitsOnly}`
-    }
-
     setFormData({ ...formData, identifier: value })
   }
 
   const handleSubmit = (e) => {
+    console.log(formData)
     e.preventDefault()
     if (!formData.identifier || !formData.password) {
       setError("Please fill in all fields.")

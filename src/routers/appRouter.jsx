@@ -43,7 +43,7 @@ export const router = createBrowserRouter([
     children: [
       { path: "/admin/dashboard", element: <AdminDashboard /> }, 
       { path: "/admin/products", element: <ProductManagement/> },
-      { path: "/admin/orders", element: <OrderManagement/>}
+      { path: "/admin/orders", element: <OrderManagement/>},
       { path: "/admin/users", element: <UserManagement/> },
       // { path: "/admin/inventory", element: <InventoryManagement/> },
       // { path: "/admin/payments", element: <PaymentManagement/> },

@@ -16,6 +16,7 @@ import OrderManagement from "../pages/admin/orderManagementPage.Jsx";
 import UserManagement from "../pages/admin/userManagementPage.jsx";
 import PaymentManagement from "../pages/admin/paymentManagementPage.jsx";
 import InventoryManagement from "../pages/admin/inventoryManagementPage.jsx";
+import ReportingDashboard from "../pages/admin/reportingAndAnalyticsPage.jsx";
 
 
 
@@ -49,7 +50,7 @@ export const router = createBrowserRouter([
       { path: "/admin/users", element: <UserManagement/> },
       { path: "/admin/inventory", element: <InventoryManagement/> },
       { path: "/admin/payments", element: <PaymentManagement/> },
-      // { path: "/admin/reports", element: <ReportingDashboard/> },
+      { path: "/admin/reports", element: <ReportingDashboard/> },
       // { path: "/admin/delivery", element: <DeliveryManagement/> },
       // { path: "/admin/settings", element: <SettingsPage/> },
       

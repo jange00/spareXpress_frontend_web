@@ -1,17 +1,36 @@
-import { useState } from "react"
+import { useContext, useState } from "react"
 import { Logo } from "../components/authComponents/login/logo"
 import { LoginMethodSelector } from "../components/authComponents/login/loginMethodSelector"
 import { SignInForm } from "../components/authComponents/login/signInForm"
+import { useLoginUserTan } from "../hook/useLoginUserTan"
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router"
+
 
 const SignInPage = () => {
   const [loginMethod, setLoginMethod] = useState("email")
+  const { mutate, data, error, isPending } = useLoginUserTan()
+  const navigate = useNavigate()
 
   const handleMethodChange = (method) => {
     setLoginMethod(method)
   }
 
   const handleFormSubmit = (formData) => {
-    console.log("Sign in attempt with:", formData)
+    console.log(formData)
+    mutate(formData, {
+      onSuccess: (res) => {
+        // login(res.user, res.token)
+        localStorage.setItem("token", res.token)
+        toast.success(data?.message || "Login Success")
+        navigate("/")
+
+      },
+      onError: (err) => {
+        console.error("Login failed:", err.message)
+        toast.error(err?.message || "Login Failed")
+      }
+    })
   }
 
   return (
@@ -30,7 +49,9 @@ const SignInPage = () => {
         <LoginMethodSelector loginMethod={loginMethod} onMethodChange={handleMethodChange} />
 
         {/* Form */}
-        <SignInForm loginMethod={loginMethod} onSubmit={handleFormSubmit} />
+        <SignInForm loginMethod={loginMethod} onSubmit={handleFormSubmit}
+         isLoading={isPending}
+         serverError={error?.message} />
       </div>
     </div>
   )

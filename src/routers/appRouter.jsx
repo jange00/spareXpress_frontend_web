@@ -9,9 +9,9 @@ import SignInPage from "../pages/signInPage";
 import SignUpPage from "../pages/signUpPage";
 import BestSellingProducts from "../components/LandingPageComponents/bestSelling/BestSellingProducts.js";
 import DiscountOffers from "../components/LandingPageComponents/offerDiscountSection/DiscountOffers.jsx";
-import AdminDashboard from "../pages/admin/adminDashboard.jsx";
 import AdminLayout from "../layouts/adminLayout.jsx";
 import ProductManagement from "../pages/admin/productManagementPage.jsx";
+
 
 
 
@@ -39,13 +39,13 @@ export const router = createBrowserRouter([
     children: [
       { path: "/admin/dashboard", element: <AdminDashboard /> }, 
       { path: "/admin/products", element: <ProductManagement/> },
-      // { path: "/admin/orders", element: <OrderManagement/> },
-      // { path: "/admin/users", element: <UserManagement/> },
-      // { path: "/admin/inventory", element: <InventoryManagement/> },
-      // { path: "/admin/payments", element: <PaymentManagement/> },
-      // { path: "/admin/reports", element: <ReportingDashboard/> },
-      // { path: "/admin/delivery", element: <DeliveryManagement/> },
-      // { path: "/admin/settings", element: <SettingsPage/> },
+      { path: "/admin/orders", element: <OrderManagement/>},
+      { path: "/admin/users", element: <UserManagement/> },
+      { path: "/admin/inventory", element: <InventoryManagement/> },
+      { path: "/admin/payments", element: <PaymentManagement/> },
+      { path: "/admin/reports", element: <ReportingDashboard/> },
+      { path: "/admin/delivery", element: <DeliveryManagement/> },
+      { path: "/admin/settings", element: <SettingsPage/> },
       
     ],
   },

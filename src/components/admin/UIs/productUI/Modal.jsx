@@ -1,5 +1,5 @@
 import { useEffect } from "react"
-import { XIcon } from "../icons/Icons"
+import { XIcon } from "../../icons/Icons"
 
 const Modal = ({ isOpen, onClose, title, children, size = "md", showCloseButton = true }) => {
   useEffect(() => {

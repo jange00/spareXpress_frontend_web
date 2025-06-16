@@ -7,11 +7,11 @@ import {
   getBrandName,
 } from "../../components/admin/ProductManagement/mockData"
 import ProductTable from "../../components/admin/ProductManagement/ProductTables"
-import Button from "../../components/admin/UIs/Button"
-import Input from "../../components/admin/UIs/Input"
-import Dropdown from "../../components/admin/UIs/Dropdown"
-import { Card, CardHeader, CardTitle, CardContent } from "../../components/admin/UIs/Card"
-import Badge from "../../components/admin/UIs/Badge"
+import Button from "../../components/admin/UIs/productUI/Button"
+import Input from "../../components/admin/UIs/productUI/Input"
+import Dropdown from "../../components/admin/UIs/productUI/Dropdown"
+import { Card, CardHeader, CardTitle, CardContent } from "../../components/admin/UIs/productUI/Card"
+import Badge from "../../components/admin/UIs/productUI/Badge"
 import AddEditProductModal from "../../components/admin/ProductManagement/modal/add-edit-product-modal"
 import ViewProductModal from "../../components/admin/ProductManagement/modal/view-product-modal"
 import {

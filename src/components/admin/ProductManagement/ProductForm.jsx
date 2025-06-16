@@ -7,11 +7,11 @@ import {
   mockSpecifications,
   getSubcategoriesByCategory,
 } from "./mockData";
-import Button from "../UIs/Button";
-import Input from "../UIs/Input";
-import Textarea from "../UIs/TextArea";
-import Dropdown from "../UIs/Dropdown";
-import { Card, CardHeader, CardTitle, CardContent } from "../UIs/Card";
+import Button from "../UIs/productUI/Button";
+import Input from "../UIs/productUI/Input";
+import Textarea from "../UIs/productUI/TextArea";
+import Dropdown from "../UIs/productUI/Dropdown";
+import { Card, CardHeader, CardTitle, CardContent } from "../UIs/productUI/Card";
 import { PlusIcon, XIcon } from "../icons/Icons";
 
 const ProductForm = ({

@@ -1,34 +1,69 @@
 import { useState, useEffect } from "react"
-import ActionBar from "../../components/admin/ProductManagement/actionBar"
-import FilterBar from "../../components/admin/productManagement/filterBar"
-import ProductTable from "../../components/admin/productManagement/productTable"
-import ProductModal from "../../components/admin/ProductManagement/productModal"
-import BulkActionModal from "../../components/admin/productManagement/bulkActionModal"
-import { initialProducts } from "../../components/admin/productManagement/sampleData"
+import {
+  mockProducts,
+  mockCategories,
+  mockBrands,
+  getCategoryName,
+  getBrandName,
+} from "../../components/admin/ProductManagement/mockData"
+import ProductTable from "../../components/admin/ProductManagement/ProductTables"
+import Button from "../../components/admin/UIs/Button"
+import Input from "../../components/admin/UIs/Input"
+import Dropdown from "../../components/admin/UIs/Dropdown"
+import { Card, CardHeader, CardTitle, CardContent } from "../../components/admin/UIs/Card"
+import Badge from "../../components/admin/UIs/Badge"
+import AddEditProductModal from "../../components/admin/ProductManagement/modal/add-edit-product-modal"
+import ViewProductModal from "../../components/admin/ProductManagement/modal/view-product-modal"
+import {
+  SearchIcon,
+  PlusIcon,
+  UploadIcon,
+  DownloadIcon,
+  FilterIcon,
+  PackageIcon,
+  TrendingUpIcon,
+  AlertTriangleIcon,
+} from "../../components/admin/icons/Icons"
 
 const ProductManagement = () => {
   // State management
-  const [products, setProducts] = useState(initialProducts)
-  const [filteredProducts, setFilteredProducts] = useState(initialProducts)
+  const [products, setProducts] = useState(mockProducts)
+  const [filteredProducts, setFilteredProducts] = useState(mockProducts)
+  const [loading, setLoading] = useState(false)
+
+  // Filter states
   const [searchTerm, setSearchTerm] = useState("")
   const [categoryFilter, setCategoryFilter] = useState("")
   const [brandFilter, setBrandFilter] = useState("")
   const [sortBy, setSortBy] = useState("name")
   const [sortOrder, setSortOrder] = useState("asc")
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [currentProduct, setCurrentProduct] = useState(null)
-  const [selectedProducts, setSelectedProducts] = useState([])
-  const [isBulkModalOpen, setIsBulkModalOpen] = useState(false)
-  const [bulkAction, setBulkAction] = useState("")
-  const [bulkValue, setBulkValue] = useState("")
-  const [selectAll, setSelectAll] = useState(false)
 
-  // Get unique categories and brands for filters
-  const categories = [...new Set(products.map((product) => product.category))]
-  const brands = [...new Set(products.map((product) => product.brand))]
+  // Modal states
+  const [isFormModalOpen, setIsFormModalOpen] = useState(false)
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false)
+  const [editingProduct, setEditingProduct] = useState(null)
+  const [viewingProduct, setViewingProduct] = useState(null)
+
+  // Selection states
+  const [selectedProducts, setSelectedProducts] = useState([])
+  const [selectAll, setSelectAll] = useState(false)
 
   // Filter and sort products
   useEffect(() => {
+    filterAndSortProducts()
+  }, [products, searchTerm, categoryFilter, brandFilter, sortBy, sortOrder])
+
+  // Update selectAll state based on filtered products
+  useEffect(() => {
+    if (filteredProducts.length > 0) {
+      const allSelected = filteredProducts.every((product) => selectedProducts.includes(product._id))
+      setSelectAll(allSelected)
+    } else {
+      setSelectAll(false)
+    }
+  }, [selectedProducts, filteredProducts])
+
+  const filterAndSortProducts = () => {
     let result = [...products]
 
     // Apply search filter
@@ -36,164 +71,129 @@ const ProductManagement = () => {
       result = result.filter(
         (product) =>
           product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          product.description.toLowerCase().includes(searchTerm.toLowerCase()),
+          product.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          getCategoryName(product.categoryId).toLowerCase().includes(searchTerm.toLowerCase()) ||
+          getBrandName(product.brandId).toLowerCase().includes(searchTerm.toLowerCase()),
       )
     }
 
     // Apply category filter
     if (categoryFilter) {
-      result = result.filter((product) => product.category === categoryFilter)
+      result = result.filter((product) => product.categoryId === categoryFilter)
     }
 
     // Apply brand filter
     if (brandFilter) {
-      result = result.filter((product) => product.brand === brandFilter)
+      result = result.filter((product) => product.brandId === brandFilter)
     }
 
     // Apply sorting
     result.sort((a, b) => {
       let comparison = 0
 
-      if (sortBy === "price") {
-        comparison = a.price - b.price
-      } else if (sortBy === "stock") {
-        comparison = a.stock - b.stock
-      } else if (sortBy === "popularity") {
-        comparison = b.reviews - a.reviews
-      } else {
-        comparison = a.name.localeCompare(b.name)
+      switch (sortBy) {
+        case "price":
+          comparison = a.price - b.price
+          break
+        case "stock":
+          comparison = a.stock - b.stock
+          break
+        case "createdAt":
+          comparison = new Date(a.createdAt) - new Date(b.createdAt)
+          break
+        case "name":
+        default:
+          comparison = a.name.localeCompare(b.name)
+          break
       }
 
       return sortOrder === "asc" ? comparison : -comparison
     })
 
     setFilteredProducts(result)
-  }, [products, searchTerm, categoryFilter, brandFilter, sortBy, sortOrder])
+  }
 
-  // Handle adding a new product
+  // Product CRUD operations
   const handleAddProduct = () => {
-    setCurrentProduct({
-      id: products.length + 1,
-      name: "",
-      category: "",
-      subcategory: "",
-      brand: "",
-      model: "",
-      price: 0,
-      originalPrice: 0,
-      rating: 0,
-      reviews: 0,
-      image: "/placeholder.svg?height=300&width=300",
-      badge: "",
-      description: "",
-      stock: 0,
-      discount: 0,
-      inStock: true,
-      specifications: {},
-      features: [],
-      compatibility: [],
-    })
-    setIsModalOpen(true)
+    setEditingProduct(null)
+    setIsFormModalOpen(true)
   }
 
-  // Handle editing a product
   const handleEditProduct = (product) => {
-    setCurrentProduct({ ...product })
-    setIsModalOpen(true)
+    setEditingProduct(product)
+    setIsFormModalOpen(true)
   }
 
-  // Handle saving a product
-  const handleSaveProduct = (formData) => {
-    if (formData.id) {
-      // Update existing product
-      setProducts(products.map((p) => (p.id === formData.id ? formData : p)))
-    } else {
-      // Add new product
-      const newProduct = {
-        ...formData,
-        id: products.length + 1,
+  const handleViewProduct = (product) => {
+    setViewingProduct(product)
+    setIsViewModalOpen(true)
+  }
+
+  const handleSaveProduct = async (formData) => {
+    setLoading(true)
+
+    // Simulate API delay
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+
+    try {
+      if (editingProduct) {
+        // Update existing product
+        const updatedProduct = {
+          ...editingProduct,
+          ...formData,
+          updatedAt: new Date().toISOString(),
+        }
+        setProducts(products.map((p) => (p._id === editingProduct._id ? updatedProduct : p)))
+      } else {
+        // Create new product
+        const newProduct = {
+          ...formData,
+          _id: `prod${Date.now()}`,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        }
+        setProducts([...products, newProduct])
       }
-      setProducts([...products, newProduct])
+      setIsFormModalOpen(false)
+      setEditingProduct(null)
+    } catch (error) {
+      console.error("Error saving product:", error)
+      alert("Failed to save product")
+    } finally {
+      setLoading(false)
     }
-    setIsModalOpen(false)
   }
 
-  // Handle deleting a product
-  const handleDeleteProduct = (id) => {
+  const handleDeleteProduct = (productId) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
-      setProducts(products.filter((p) => p.id !== id))
+      setProducts(products.filter((p) => p._id !== productId))
+      setSelectedProducts(selectedProducts.filter((id) => id !== productId))
     }
   }
 
-  // Handle bulk selection
-  const handleSelectProduct = (id) => {
-    if (selectedProducts.includes(id)) {
-      setSelectedProducts(selectedProducts.filter((productId) => productId !== id))
+  // Selection handlers
+  const handleSelectProduct = (productId) => {
+    if (selectedProducts.includes(productId)) {
+      setSelectedProducts(selectedProducts.filter((id) => id !== productId))
     } else {
-      setSelectedProducts([...selectedProducts, id])
+      setSelectedProducts([...selectedProducts, productId])
     }
   }
 
-  // Handle select all
   const handleSelectAll = () => {
     if (selectAll) {
       setSelectedProducts([])
     } else {
-      setSelectedProducts(filteredProducts.map((p) => p.id))
+      setSelectedProducts(filteredProducts.map((p) => p._id))
     }
-    setSelectAll(!selectAll)
   }
 
-  // Handle bulk actions
-  const handleBulkAction = () => {
-    if (selectedProducts.length === 0) {
-      alert("Please select at least one product")
-      return
+  // Bulk operations
+  const handleBulkDelete = () => {
+    if (window.confirm(`Are you sure you want to delete ${selectedProducts.length} products?`)) {
+      setProducts(products.filter((p) => !selectedProducts.includes(p._id)))
+      setSelectedProducts([])
     }
-
-    setBulkAction("")
-    setBulkValue("")
-    setIsBulkModalOpen(true)
-  }
-
-  // Apply bulk actions
-  const applyBulkAction = () => {
-    if (bulkAction === "delete") {
-      if (window.confirm(`Are you sure you want to delete ${selectedProducts.length} products?`)) {
-        setProducts(products.filter((p) => !selectedProducts.includes(p.id)))
-        setSelectedProducts([])
-      }
-    } else if (bulkAction === "price") {
-      const newPrice = Number.parseFloat(bulkValue)
-      if (isNaN(newPrice) || newPrice < 0) {
-        alert("Please enter a valid price")
-        return
-      }
-
-      setProducts(
-        products.map((p) => {
-          if (selectedProducts.includes(p.id)) {
-            return { ...p, price: newPrice }
-          }
-          return p
-        }),
-      )
-    } else if (bulkAction === "stock") {
-      if (bulkValue === "out") {
-        setProducts(
-          products.map((p) => {
-            if (selectedProducts.includes(p.id)) {
-              return { ...p, stock: 0, inStock: false }
-            }
-            return p
-          }),
-        )
-      }
-    }
-
-    setIsBulkModalOpen(false)
-    setSelectedProducts([])
-    setSelectAll(false)
   }
 
   // Import/Export functions
@@ -208,7 +208,13 @@ const ProductManagement = () => {
         reader.onload = (event) => {
           try {
             const importedProducts = JSON.parse(event.target.result)
-            setProducts([...products, ...importedProducts])
+            const newProducts = importedProducts.map((product) => ({
+              ...product,
+              _id: `prod${Date.now()}_${Math.random()}`,
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            }))
+            setProducts([...products, ...newProducts])
             alert(`Successfully imported ${importedProducts.length} products`)
           } catch (error) {
             alert("Error importing products. Please check the file format.")
@@ -224,80 +230,249 @@ const ProductManagement = () => {
     const dataStr = JSON.stringify(products, null, 2)
     const dataUri = "data:application/json;charset=utf-8," + encodeURIComponent(dataStr)
 
-    const exportFileDefaultName = "products.json"
-
     const linkElement = document.createElement("a")
     linkElement.setAttribute("href", dataUri)
-    linkElement.setAttribute("download", exportFileDefaultName)
+    linkElement.setAttribute("download", `products_${new Date().toISOString().split("T")[0]}.json`)
     linkElement.click()
   }
 
-  return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
-      {/* Top Section - Actions & Filters */}
-      <div className="bg-white border-b border-gray-200 shadow-sm">
-        <div className="container mx-auto px-4 py-4">
-          <ActionBar
-            onAddProduct={handleAddProduct}
-            onImportProducts={handleImportProducts}
-            onExportProducts={handleExportProducts}
-            onBulkAction={handleBulkAction}
-            selectedCount={selectedProducts.length}
-          />
+  // Clear all filters
+  const clearFilters = () => {
+    setSearchTerm("")
+    setCategoryFilter("")
+    setBrandFilter("")
+    setSortBy("name")
+    setSortOrder("asc")
+  }
 
-          <FilterBar
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            categoryFilter={categoryFilter}
-            setCategoryFilter={setCategoryFilter}
-            brandFilter={brandFilter}
-            setBrandFilter={setBrandFilter}
-            sortBy={sortBy}
-            setSortBy={setSortBy}
-            sortOrder={sortOrder}
-            setSortOrder={setSortOrder}
-            categories={categories}
-            brands={brands}
-          />
+  // Prepare dropdown options
+  const categoryOptions = [
+    { value: "", label: "All Categories" },
+    ...mockCategories.map((cat) => ({
+      value: cat._id,
+      label: cat.name,
+    })),
+  ]
+
+  const brandOptions = [
+    { value: "", label: "All Brands" },
+    ...mockBrands.map((brand) => ({
+      value: brand._id,
+      label: brand.name,
+    })),
+  ]
+
+  const sortOptions = [
+    { value: "name-asc", label: "Name (A-Z)" },
+    { value: "name-desc", label: "Name (Z-A)" },
+    { value: "price-asc", label: "Price (Low to High)" },
+    { value: "price-desc", label: "Price (High to Low)" },
+    { value: "stock-asc", label: "Stock (Low to High)" },
+    { value: "stock-desc", label: "Stock (High to Low)" },
+    { value: "createdAt-desc", label: "Newest First" },
+    { value: "createdAt-asc", label: "Oldest First" },
+  ]
+
+  // Calculate statistics
+  const stats = {
+    total: products.length,
+    lowStock: products.filter((p) => p.stock > 0 && p.stock <= 5).length,
+    outOfStock: products.filter((p) => p.stock === 0).length,
+    totalValue: products.reduce((sum, p) => sum + p.price * p.stock, 0),
+  }
+
+  const hasActiveFilters = searchTerm || categoryFilter || brandFilter || sortBy !== "name" || sortOrder !== "asc"
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Product Management</h1>
+              <p className="mt-1 text-sm text-gray-500">Manage your product inventory and details</p>
+            </div>
+
+            {/* Quick Actions */}
+            <div className="flex flex-wrap gap-3">
+              <Button onClick={handleAddProduct}>
+                <PlusIcon className="w-5 h-5 mr-2" />
+                Add Product
+              </Button>
+              <Button variant="secondary" onClick={handleImportProducts}>
+                <UploadIcon className="w-5 h-5 mr-2" />
+                Import
+              </Button>
+              <Button variant="secondary" onClick={handleExportProducts}>
+                <DownloadIcon className="w-5 h-5 mr-2" />
+                Export
+              </Button>
+              {selectedProducts.length > 0 && (
+                <Button variant="danger" onClick={handleBulkDelete}>
+                  Delete Selected ({selectedProducts.length})
+                </Button>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Product List Table */}
-      <div className="flex-1 container mx-auto px-4 py-6">
+      <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Statistics Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <Card className="p-6">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <PackageIcon className="h-8 w-8 text-blue-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-500">Total Products</p>
+                <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-6">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <AlertTriangleIcon className="h-8 w-8 text-yellow-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-500">Low Stock</p>
+                <p className="text-2xl font-bold text-yellow-600">{stats.lowStock}</p>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-6">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <AlertTriangleIcon className="h-8 w-8 text-red-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-500">Out of Stock</p>
+                <p className="text-2xl font-bold text-red-600">{stats.outOfStock}</p>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-6">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <TrendingUpIcon className="h-8 w-8 text-green-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-500">Total Value</p>
+                <p className="text-2xl font-bold text-green-600">${stats.totalValue.toLocaleString()}</p>
+              </div>
+            </div>
+          </Card>
+        </div>
+
+        {/* Filters */}
+        <Card className="mb-8">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2">
+                <FilterIcon className="w-5 h-5" />
+                Filters & Search
+              </CardTitle>
+              {hasActiveFilters && (
+                <Button variant="outline" size="sm" onClick={clearFilters}>
+                  Clear Filters
+                </Button>
+              )}
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <Input
+                placeholder="Search products..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                leftIcon={<SearchIcon className="w-5 h-5 text-gray-400" />}
+              />
+
+              <Dropdown
+                options={categoryOptions}
+                value={categoryFilter}
+                onChange={setCategoryFilter}
+                placeholder="Filter by Category"
+              />
+
+              <Dropdown
+                options={brandOptions}
+                value={brandFilter}
+                onChange={setBrandFilter}
+                placeholder="Filter by Brand"
+              />
+
+              <Dropdown
+                options={sortOptions}
+                value={`${sortBy}-${sortOrder}`}
+                onChange={(value) => {
+                  const [newSortBy, newSortOrder] = value.split("-")
+                  setSortBy(newSortBy)
+                  setSortOrder(newSortOrder)
+                }}
+                placeholder="Sort by"
+              />
+            </div>
+
+            {/* Active Filters Display */}
+            {hasActiveFilters && (
+              <div className="mt-4 flex flex-wrap gap-2">
+                {searchTerm && <Badge variant="primary">Search: "{searchTerm}"</Badge>}
+                {categoryFilter && <Badge variant="primary">Category: {getCategoryName(categoryFilter)}</Badge>}
+                {brandFilter && <Badge variant="primary">Brand: {getBrandName(brandFilter)}</Badge>}
+                {(sortBy !== "name" || sortOrder !== "asc") && (
+                  <Badge variant="primary">
+                    Sort: {sortOptions.find((opt) => opt.value === `${sortBy}-${sortOrder}`)?.label}
+                  </Badge>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Results Summary */}
+        <div className="mb-6">
+          <p className="text-sm text-gray-600">
+            Showing {filteredProducts.length} of {products.length} products
+            {selectedProducts.length > 0 && <span className="ml-2">• {selectedProducts.length} selected</span>}
+          </p>
+        </div>
+
+        {/* Product Table */}
         <ProductTable
           products={filteredProducts}
           selectedProducts={selectedProducts}
-          selectAll={selectAll}
-          onSelectAll={handleSelectAll}
           onSelectProduct={handleSelectProduct}
+          onSelectAll={handleSelectAll}
           onEditProduct={handleEditProduct}
           onDeleteProduct={handleDeleteProduct}
+          onViewProduct={handleViewProduct}
+          selectAll={selectAll}
         />
       </div>
 
       {/* Add/Edit Product Modal */}
-      {isModalOpen && (
-        <ProductModal
-          product={currentProduct}
-          onSave={handleSaveProduct}
-          onClose={() => setIsModalOpen(false)}
-          categories={categories}
-          brands={brands}
-        />
-      )}
+      <AddEditProductModal
+        isOpen={isFormModalOpen}
+        onClose={() => setIsFormModalOpen(false)}
+        editingProduct={editingProduct}
+        onSave={handleSaveProduct}
+        isLoading={loading}
+      />
 
-      {/* Bulk Action Modal */}
-      {isBulkModalOpen && (
-        <BulkActionModal
-          selectedCount={selectedProducts.length}
-          onApply={applyBulkAction}
-          onClose={() => setIsBulkModalOpen(false)}
-          bulkAction={bulkAction}
-          setBulkAction={setBulkAction}
-          bulkValue={bulkValue}
-          setBulkValue={setBulkValue}
-        />
-      )}
+      {/* View Product Modal */}
+      <ViewProductModal
+        isOpen={isViewModalOpen}
+        onClose={() => setIsViewModalOpen(false)}
+        product={viewingProduct}
+        onEdit={handleEditProduct}
+      />
     </div>
   )
 }

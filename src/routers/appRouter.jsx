@@ -11,7 +11,8 @@ import BestSellingProducts from "../components/LandingPageComponents/bestSelling
 import DiscountOffers from "../components/LandingPageComponents/offerDiscountSection/DiscountOffers.jsx";
 import AdminDashboard from "../pages/admin/adminDashboard.jsx";
 import AdminLayout from "../layouts/adminLayout.jsx";
-import ProductManagement from "../components/admin/ProductManagement/productManagement.jsx";
+import ProductManagement from "../pages/admin/productManagementPage.jsx";
+
 
 
 export const router = createBrowserRouter([

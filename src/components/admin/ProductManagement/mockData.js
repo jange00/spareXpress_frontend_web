@@ -138,7 +138,7 @@ export const mockCategories = [
       updatedAt: "2024-01-10T08:15:00Z",
     },
     {
-      _id: "prod6",
+      _id: "prod7",
       name: "IKEA MALM Bed Frame",
       categoryId: "cat1",
       subCategoryId: "sub2",
@@ -154,7 +154,7 @@ export const mockCategories = [
       updatedAt: "2024-01-10T08:15:00Z",
     },
     {
-      _id: "prod6",
+      _id: "prod8",
       name: "IKEA MALM Bed Frame",
       categoryId: "cat1",
       subCategoryId: "sub1",

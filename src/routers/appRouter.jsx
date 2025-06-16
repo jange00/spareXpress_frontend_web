@@ -11,6 +11,14 @@ import BestSellingProducts from "../components/LandingPageComponents/bestSelling
 import DiscountOffers from "../components/LandingPageComponents/offerDiscountSection/DiscountOffers.jsx";
 import AdminLayout from "../layouts/adminLayout.jsx";
 import ProductManagement from "../pages/admin/productManagementPage.jsx";
+import AdminDashboard from "../pages/admin/adminDashboardPage.jsx";
+import OrderManagement from "../pages/admin/orderManagementPage.jsx";
+import UserManagement from "../pages/admin/userManagementPage.jsx";
+import InventoryManagement from "../pages/admin/inventoryManagementPage.jsx";
+import PaymentManagement from "../pages/admin/paymentManagementPage.jsx";
+import ReportingDashboard from "../pages/admin/reportingAndAnalyticsPage.jsx";
+import DeliveryManagement from "../pages/admin/deliveryMangementPage.jsx";
+import SettingsPage from "../pages/admin/adminSettingPage.jsx";
 
 
 

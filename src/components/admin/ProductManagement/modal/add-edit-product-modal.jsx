@@ -1,4 +1,4 @@
-import Modal from "../../UIs/Modal"
+import Modal from "../../UIs/productUI/Modal"
 import ProductForm from "../ProductForm"
 
 const AddEditProductModal = ({ isOpen, onClose, editingProduct, onSave, isLoading }) => {

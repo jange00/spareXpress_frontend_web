@@ -1,5 +1,5 @@
-import Modal from "../../UIs/Modal"
-import Button from "../../UIs/Button"
+import Modal from "../../UIs/productUI/Modal"
+import Button from "../../UIs/productUI/Button"
 import { getCategoryName, getBrandName, getSubcategoryName } from "../mockData"
 
 const ViewProductModal = ({ isOpen, onClose, product, onEdit }) => {

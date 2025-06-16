@@ -1,5 +1,5 @@
-import Button from "../UIs/Button"
-import Badge from "../UIs/Badge"
+import Button from "../UIs/productUI/Button"
+import Badge from "../UIs/productUI/Badge"
 import { EditIcon, TrashIcon, EyeIcon } from "../icons/Icons"
 import { getCategoryName, getSubcategoryName, getBrandName } from "./mockData"
 

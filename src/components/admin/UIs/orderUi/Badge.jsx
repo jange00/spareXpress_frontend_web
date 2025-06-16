@@ -1,12 +1,3 @@
-/**
- * Badge Component
- *
- * Displays a colored badge for status indicators
- *
- * @param {Object} props - Component props
- * @param {string} props.color - Badge color (yellow, blue, green, red, gray, indigo)
- * @param {React.ReactNode} props.children - Badge content
- */
 export const Badge = ({ color, children }) => {
     const colorClasses = {
       yellow: "bg-yellow-500 text-black",
@@ -25,4 +16,3 @@ export const Badge = ({ color, children }) => {
       </span>
     )
   }
-  

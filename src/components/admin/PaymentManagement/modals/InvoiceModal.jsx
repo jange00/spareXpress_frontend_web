@@ -1,36 +1,31 @@
-import { PrinterIcon, DownloadIcon } from "./icons"
+import { X, Printer, Download } from "lucide-react"
+import { formatDate, formatCurrency, generateInvoiceNumber } from "../../utils/payment/formatters"
 
-export const InvoiceModal = ({ transaction, onClose, formatDate, formatCurrency, generateInvoiceNumber }) => {
-  // Generate invoice number
+export default function InvoiceModal({ transaction, onClose }) {
   const invoiceNumber = generateInvoiceNumber(transaction.id)
 
-  // Calculate order subtotal
   const calculateSubtotal = () => {
     return transaction.items.reduce((total, item) => total + item.price * item.quantity, 0)
   }
 
-  // Calculate tax (assuming 8% tax rate)
   const calculateTax = () => {
     return calculateSubtotal() * 0.08
   }
 
-  // Calculate total
   const calculateTotal = () => {
     return calculateSubtotal() + calculateTax()
   }
 
-  // Handle print invoice
   const handlePrintInvoice = () => {
     window.print()
   }
 
-  // Handle download invoice
   const handleDownloadInvoice = () => {
     alert("Invoice download functionality would be implemented here")
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-md bg-opacity-50 flex items-center justify-center z-40 p-4">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
         <div className="flex justify-between items-center border-b border-gray-200 px-6 py-4">
           <h2 className="text-xl font-bold text-gray-900">Invoice: {invoiceNumber}</h2>
@@ -39,15 +34,18 @@ export const InvoiceModal = ({ transaction, onClose, formatDate, formatCurrency,
               onClick={handlePrintInvoice}
               className="inline-flex items-center px-3 py-1.5 bg-gray-100 text-gray-800 text-sm font-medium rounded-md hover:bg-gray-200 transition-colors"
             >
-              <PrinterIcon className="w-4 h-4 mr-1" />
+              <Printer className="w-4 h-4 mr-1" />
               Print
             </button>
             <button
               onClick={handleDownloadInvoice}
               className="inline-flex items-center px-3 py-1.5 bg-gray-100 text-gray-800 text-sm font-medium rounded-md hover:bg-gray-200 transition-colors"
             >
-              <DownloadIcon className="w-4 h-4 mr-1" />
+              <Download className="w-4 h-4 mr-1" />
               Download PDF
+            </button>
+            <button onClick={onClose} className="text-gray-400 hover:text-gray-500">
+              <X className="w-6 h-6" />
             </button>
           </div>
         </div>
@@ -61,10 +59,10 @@ export const InvoiceModal = ({ transaction, onClose, formatDate, formatCurrency,
                 <p className="text-gray-600">{invoiceNumber}</p>
               </div>
               <div className="text-right">
-                <h2 className="text-xl font-bold text-gray-900">SparExpress</h2>
-                <p className="text-gray-600">123 Auto Parts Street</p>
+                <h2 className="text-xl font-bold text-gray-900">PaymentPro</h2>
+                <p className="text-gray-600">123 Business Street</p>
                 <p className="text-gray-600">New York, NY 10001</p>
-                <p className="text-gray-600">support@sparexpress.com</p>
+                <p className="text-gray-600">support@paymentpro.com</p>
                 <p className="text-gray-600">+1 (555) 123-4567</p>
               </div>
             </div>
@@ -75,11 +73,12 @@ export const InvoiceModal = ({ transaction, onClose, formatDate, formatCurrency,
                 <h3 className="font-medium text-gray-900 mb-2">Bill To:</h3>
                 <p className="text-gray-800">{transaction.customerName}</p>
                 <p className="text-gray-600">{transaction.customerEmail}</p>
-                <p className="text-gray-600">{transaction.billingAddress.street}</p>
+                <p className="text-gray-600">{transaction.shippingAddress.street}</p>
                 <p className="text-gray-600">
-                  {transaction.billingAddress.city}, {transaction.billingAddress.state} {transaction.billingAddress.zip}
+                  {transaction.shippingAddress.city}, {transaction.shippingAddress.state}{" "}
+                  {transaction.shippingAddress.zip}
                 </p>
-                <p className="text-gray-600">{transaction.billingAddress.country}</p>
+                <p className="text-gray-600">{transaction.shippingAddress.country}</p>
               </div>
               <div className="text-right">
                 <div className="space-y-1">
@@ -197,12 +196,6 @@ export const InvoiceModal = ({ transaction, onClose, formatDate, formatCurrency,
                           : "Failed"}
                   </span>
                 </div>
-                {transaction.gatewayReference && (
-                  <div className="flex justify-between mt-1">
-                    <span className="text-gray-600">Reference:</span>
-                    <span className="text-gray-800">{transaction.gatewayReference}</span>
-                  </div>
-                )}
               </div>
             </div>
 
@@ -225,9 +218,9 @@ export const InvoiceModal = ({ transaction, onClose, formatDate, formatCurrency,
           </button>
           <button
             onClick={handleDownloadInvoice}
-            className="px-4 py-2 bg-[#FFB800] text-black font-medium rounded-md hover:bg-[#FFB800]/90 transition-colors"
+            className="px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors"
           >
-            <DownloadIcon className="w-5 h-5 mr-1 inline" />
+            <Download className="w-5 h-5 mr-1 inline" />
             Download Invoice
           </button>
         </div>

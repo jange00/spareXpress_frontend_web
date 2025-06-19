@@ -21,6 +21,7 @@ const ProductForm = ({
   isLoading = false,
 }) => {
   const [subcategories, setSubcategories] = useState([]);
+  
 
   // Default form values
   const defaultValues = {
@@ -39,8 +40,9 @@ const ProductForm = ({
   };
 
   const handleCategoryChange = (categoryId, setFieldValue) => {
+    console.log(categoryId);
     setFieldValue("categoryId", categoryId);
-    setFieldValue("subCategoryId", ""); // Reset subcategory
+    setFieldValue("subCategoryId", ""); 
 
     if (categoryId) {
       const categorySubcategories = getSubcategoriesByCategory(categoryId);

@@ -4,10 +4,11 @@ import { postProductService } from "../../../services/admin/productService/postP
 export const usePostProduct = () => {
   const queryClient = useQueryClient();
 
-  return useMutation(postProductService, {
+  return useMutation({
+    mutationFn: postProductService, 
     onSuccess: () => {
-      // Invalidate product list cache to refetch updated list
-      queryClient.invalidateQueries(["admin_product"]);
+      // ✅ Correct cache key format
+      queryClient.invalidateQueries({ queryKey: ["admin_product"] });
     },
     onError: (error) => {
       console.error("Product creation error:", error);

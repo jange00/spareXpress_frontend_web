@@ -14,15 +14,31 @@ import Dropdown from "../UIs/productUI/Dropdown";
 import { Card, CardHeader, CardTitle, CardContent } from "../UIs/productUI/Card";
 import { PlusIcon, XIcon } from "../icons/Icons";
 
+// API mutation hook
+import { usePostProduct } from "../../../hook/admin/useProduct/usePostProduct";
+import { useGetAllCategory } from "../../../hook/admin/useCategory/useGetAllCategory"; 
+import { useGetAllBrand } from "../../../hook/admin/useBrands/useGetAllBrand";
+import { useGetAllSubCategory } from "../../../hook/admin/useSubCategory/useGetAllSubCategory";
+
 const ProductForm = ({
   initialValues,
   onSubmit,
   onCancel,
   isLoading = false,
 }) => {
-  const [subcategories, setSubcategories] = useState([]);
+  // const [subcategories, setSubcategories] = useState([]);
   
 
+  // Initialize product mutation
+  const { mutate, isLoading: isSubmitting } = usePostProduct();
+  const { data: categories = [] } = useGetAllCategory();
+  const { data: brands = [] } = useGetAllBrand();
+  const {data:subcategories=[]}=useGetAllSubCategory()
+  // console.log(subcategories)
+  // console.log(brands)
+  // const { data: specifications = [] } = useGetAllSpecification();
+  // console.log(categories)
+  
   // Default form values
   const defaultValues = {
     name: "",
@@ -30,60 +46,52 @@ const ProductForm = ({
     subCategoryId: "",
     brandId: "",
     price: "",
-    image: [""],
+    image: [],
     description: "",
     stock: "",
     shippingCharge: "",
     discount: "",
-    specificationsId: "",
+    // specificationsId: "",
     ...initialValues,
   };
 
   const handleCategoryChange = (categoryId, setFieldValue) => {
     console.log(categoryId);
     setFieldValue("categoryId", categoryId);
-    setFieldValue("subCategoryId", ""); 
+    setFieldValue("subCategoryId", ); 
 
-    if (categoryId) {
-      const categorySubcategories = getSubcategoriesByCategory(categoryId);
-      setSubcategories(categorySubcategories);
-    } else {
-      setSubcategories([]);
-    }
+    // if (categoryId) {
+    //   const categorySubcategories = getSubcategoriesByCategory(categoryId);
+    //   setSubcategories(categorySubcategories);
+    // } else {
+    //   setSubcategories([]);
+    // }
   };
 
   // Initialize subcategories if editing
-  useEffect(() => {
-    if (initialValues?.categoryId) {
-      const categorySubcategories = getSubcategoriesByCategory(
-        initialValues.categoryId
-      );
-      setSubcategories(categorySubcategories);
-    }
-  }, [initialValues]);
 
-  const categoryOptions = mockCategories.map((cat) => ({
-    value: cat._id,
-    label: cat.name,
-  }));
+
+  const categoryOptions = categories.map((cat) => ({ value: cat._id, label: cat.title }));
+
 
   const subcategoryOptions = subcategories.map((subcat) => ({
     value: subcat._id,
-    label: subcat.name,
+    label: subcat.title
+    ,
   }));
 
-  const brandOptions = mockBrands.map((brand) => ({
+  const brandOptions = brands.map((brand) => ({
     value: brand._id,
-    label: brand.name,
+    label: brand.title,
   }));
 
-  const specificationOptions = [
-    { value: "", label: "No Specifications" },
-    ...mockSpecifications.map((spec) => ({
-      value: spec._id,
-      label: spec.name,
-    })),
-  ];
+  // const specificationOptions = [
+  //   { value: "", label: "No Specifications" },
+  //   ...mockSpecifications.map((spec) => ({
+  //     value: spec._id,
+  //     label: spec.name,
+  //   })),
+  // ];
 
   return (
     <div className="p-6">
@@ -91,6 +99,13 @@ const ProductForm = ({
         initialValues={defaultValues}
         validationSchema={productValidationSchema}
         onSubmit={onSubmit}
+        // onSubmit={(values, { setSubmitting }) => {
+        //   mutate(values, {
+        //     onSettled: () => {
+        //       setSubmitting(false);
+        //     },
+        //   });
+        // }}
         enableReinitialize
       >
         {({ values, errors, touched, setFieldValue, isSubmitting }) => (
@@ -149,7 +164,7 @@ const ProductForm = ({
                       error={touched.categoryId && errors.categoryId}
                     />
                     {touched.categoryId && errors.categoryId && (
-                      <p className="mt-1 text-sm text-red-500">
+                      <p className="mt-1 text-sm text-red">
                         {errors.categoryId}
                       </p>
                     )}
@@ -327,7 +342,7 @@ const ProductForm = ({
                 </div>
 
                 {/* Specifications */}
-                <div>
+                {/* <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Specifications
                   </label>
@@ -339,7 +354,7 @@ const ProductForm = ({
                     }
                     placeholder="Select Specifications (Optional)"
                   />
-                </div>
+                </div> */}
               </CardContent>
             </Card>
 

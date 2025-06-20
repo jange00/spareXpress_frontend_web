@@ -20,7 +20,7 @@ import { useGetAllOrder } from "../../hook/admin/useOrder/useGetAllOrder"
 
 export const OrderManagement = () => {
   const { data: order = [] } = useGetAllOrder();
-  console.log(order)
+  // console.log(order)
   // State management
   const [orders, setOrders] = useState(order)
   const [filteredOrders, setFilteredOrders] = useState(order)

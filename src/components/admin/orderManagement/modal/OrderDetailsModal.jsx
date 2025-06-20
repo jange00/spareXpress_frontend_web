@@ -202,7 +202,7 @@ export const OrderDetailsModal = ({ order, onClose, onUpdate, onDelete }) => {
                       <p className="text-gray-500">Address ID: {order.shippingAddressId}</p>
                     </div>
                   ) : (
-                    <p className="text-sm text-gray-500">Address ID: {order.shippingAddressId.province}</p>
+                    <p className="text-sm text-gray-500">Address ID: {order.shippingAddressId.city}</p>
                   )}
                 </div>
 

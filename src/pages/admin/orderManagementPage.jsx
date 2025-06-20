@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useEffect } from "react"
 import { OrderDetailsModal } from "../../components/admin/orderManagement/modal/OrderDetailsModal"
 import { AddOrderModal } from "../../components/admin/orderManagement/modal/AddOrderModal"

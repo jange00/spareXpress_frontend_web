@@ -5,6 +5,9 @@ import ImageUpload from "../../UIs/adminUserUi/image-upload"
 import { userValidationSchema, userUpdateValidationSchema } from "../../utils/adminUser/validation-schemas"
 
 
+// API mutation hook
+import { usePostAdminUsers } from "../../../../hook/admin/useUsers/usePostAdminUsers"
+
 const UserForm = ({ initialValues = null, onSubmit, onCancel, isEditing = false, isLoading = false }) => {
   const defaultFormValues = {
     fullname: "",
@@ -14,6 +17,9 @@ const UserForm = ({ initialValues = null, onSubmit, onCancel, isEditing = false,
     role: "Customer",
     profilePicture: "",
   }
+
+  // Initialize product mutation
+  const { mutate, isLoading: isSubmitting } = usePostAdminUsers();
 
   const getFormValues = () => {
     if (isEditing && initialValues) {
@@ -29,32 +35,53 @@ const UserForm = ({ initialValues = null, onSubmit, onCancel, isEditing = false,
     return isEditing ? userUpdateValidationSchema : userValidationSchema
   }
 
-  const handleFormSubmit = async (values, { setSubmitting, setFieldError }) => {
-    try {
-      const cleanedValues = {
-        ...values,
-        fullname: values.fullname.trim(),
-        email: values.email.toLowerCase().trim(),
-        phoneNumber: values.phoneNumber.trim(),
-      }
-
-      // Remove empty password in edit mode
-      if (isEditing && !cleanedValues.password) {
-        delete cleanedValues.password
-      }
-
-      await onSubmit(cleanedValues)
-    } catch (error) {
-      console.error("Form submission error:", error)
-      if (error.validationErrors) {
-        Object.keys(error.validationErrors).forEach((field) => {
-          setFieldError(field, error.validationErrors[field])
-        })
-      }
-    } finally {
-      setSubmitting(false)
+const handleFormSubmit = async (values, { setSubmitting, setFieldError }) => {
+  console.log("Submitting form with values:", values);
+  try {
+    const formData = new FormData();
+    
+    
+    formData.append("fullname", values.fullname.trim());
+    formData.append("email", values.email.toLowerCase().trim());
+    formData.append("phoneNumber", values.phoneNumber.trim());
+    formData.append("role", values.role);
+    if (values.password) {
+      formData.append("password", values.password);
     }
+    if (values.profilePicture && values.profilePicture instanceof File) {
+      formData.append("profilePicture", values.profilePicture);
+    }
+    for (let pair of formData.entries()) {
+      console.log(pair[0], pair[1]);
+    }
+    mutate(formData, {
+      onSuccess: () => {
+        alert("User created successfully!");
+        if (onCancel) onCancel(); // Optionally close modal or reset form
+      },
+      onError: (error) => {
+        alert("There was an error creating the user.");
+        if (error && error.validationErrors) {
+          Object.entries(error.validationErrors).forEach(([field, msg]) => {
+            setFieldError(field, msg);
+          });
+        }
+      },
+      onSettled: () => {
+        setSubmitting(false);
+      }
+    });
+  } catch (error) {
+    console.error("Form submission error:", error);
+    if (error.validationErrors) {
+      Object.entries(error.validationErrors).forEach(([field, msg]) => {
+        setFieldError(field, msg);
+      });
+    }
+    setSubmitting(false);
   }
+};
+
 
   return (
     <div className="space-y-8">

@@ -7,7 +7,7 @@ export const usePostProduct = () => {
   return useMutation({
     mutationFn: postProductService, 
     onSuccess: () => {
-      // ✅ Correct cache key format
+      
       queryClient.invalidateQueries({ queryKey: ["admin_product"] });
     },
     onError: (error) => {

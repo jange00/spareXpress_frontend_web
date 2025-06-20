@@ -30,5 +30,25 @@ export const productValidationSchema = Yup.object().shape({
 
   image: Yup.array().of(Yup.string().url("Invalid image URL")).min(1, "At least one image is required"),
 
+  // image: Yup.array()
+  // .of(
+  //   Yup.mixed().test("is-valid-image", "Invalid image", (value) => {
+  //     if (!value) return false;
+
+  //     // ✅ Accept if it's a File
+  //     if (value instanceof File) return true;
+
+  //     // ✅ Accept if it's a valid URL (for editing)
+  //     if (typeof value === "string" && /^https?:\/\/.+/.test(value)) return true;
+
+  //     return false;
+  //   })
+  // )
+  // .min(1, "At least one image is required"),
+
+
+
+
+
   specificationsId: Yup.string(),
 })

@@ -1,30 +1,30 @@
 // Sample data for the order management system
 
 export const sampleUsers = [
-  { _id: "user1", name: "John Doe", email: "john.doe@example.com", phone: "+1 (555) 123-4567" },
-  { _id: "user2", name: "Alice Smith", email: "alice.smith@example.com", phone: "+1 (555) 987-6543" },
-  { _id: "user3", name: "Bob Johnson", email: "bob.johnson@example.com", phone: "+1 (555) 456-7890" },
-  { _id: "user4", name: "Sarah Wilson", email: "sarah.wilson@example.com", phone: "+1 (555) 321-0987" },
-  { _id: "user5", name: "Mike Davis", email: "mike.davis@example.com", phone: "+1 (555) 654-3210" },
+  { _id: "user1", name: "Sushant Mahato", email: "sushant@example.com", phone: "9812184550" },
+  { _id: "user2", name: "Saroj Sah", email: "saroj@example.com", phone: "468726482" },
+  { _id: "user3", name: "Dinesh Kunwar", email: "dinesh@example.com", phone: "684648" },
+  // { _id: "user4", name: "Sarah Wilson", email: "sarah.wilson@example.com", phone: "+1 (555) 321-0987" },
+  // { _id: "user5", name: "Mike Davis", email: "mike.davis@example.com", phone: "+1 (555) 654-3210" },
 ]
 
 export const sampleProducts = [
   { _id: "prod1", name: "SSD 1TB", price: 120.0 },
   { _id: "prod2", name: "Thermal Paste", price: 15.0 },
   { _id: "prod3", name: "Mechanical Keyboard", price: 150.0 },
-  { _id: "prod4", name: "Gaming Mouse", price: 50.0 },
-  { _id: "prod5", name: "Mouse Pad", price: 25.0 },
-  { _id: "prod6", name: "USB Cable", price: 12.0 },
-  { _id: "prod7", name: "Monitor Stand", price: 35.0 },
-  { _id: "prod8", name: "Webcam", price: 80.0 },
+  // { _id: "prod4", name: "Gaming Mouse", price: 50.0 },
+  // { _id: "prod5", name: "Mouse Pad", price: 25.0 },
+  // { _id: "prod6", name: "USB Cable", price: 12.0 },
+  // { _id: "prod7", name: "Monitor Stand", price: 35.0 },
+  // { _id: "prod8", name: "Webcam", price: 80.0 },
 ]
 
 export const sampleShippingAddresses = [
-  { _id: "addr1", address: "123 Main St, New York, NY 10001, USA", userId: "user1" },
-  { _id: "addr2", address: "456 Park Ave, Boston, MA 02108, USA", userId: "user2" },
-  { _id: "addr3", address: "789 Oak St, Chicago, IL 60601, USA", userId: "user3" },
-  { _id: "addr4", address: "321 Pine St, Los Angeles, CA 90210, USA", userId: "user4" },
-  { _id: "addr5", address: "654 Elm St, Miami, FL 33101, USA", userId: "user5" },
+  { _id: "addr1", address: "Kathmandu", userId: "user1" },
+  { _id: "addr2", address: "India", userId: "user2" },
+  { _id: "addr3", address: "Banke", userId: "user3" },
+  // { _id: "addr4", address: "321 Pine St, Los Angeles, CA 90210, USA", userId: "user4" },
+  // { _id: "addr5", address: "654 Elm St, Miami, FL 33101, USA", userId: "user5" },
 ]
 
 export const samplePayments = [
@@ -74,36 +74,36 @@ export const initialOrders = [
     createdAt: "2025-01-13T09:15:00Z",
     updatedAt: "2025-01-13T09:15:00Z",
   },
-  {
-    _id: "65f1a2b3c4d5e6f7g8h9i0j4",
-    userId: "user4",
-    Amount: 320.0,
-    shippingAddressId: "addr4",
-    paymentId: "pay4",
-    items: [
-      { productId: "prod3", quantity: 1, total: 150.0 },
-      { productId: "prod8", quantity: 1, total: 80.0 },
-      { productId: "prod7", quantity: 1, total: 35.0 },
-      { productId: "prod6", quantity: 3, total: 36.0 },
-      { productId: "prod2", quantity: 1, total: 15.0 },
-    ],
-    createdAt: "2025-01-12T16:20:00Z",
-    updatedAt: "2025-01-12T16:20:00Z",
-  },
-  {
-    _id: "65f1a2b3c4d5e6f7g8h9i0j5",
-    userId: "user5",
-    Amount: 95.0,
-    shippingAddressId: "addr5",
-    paymentId: "pay5",
-    items: [
-      { productId: "prod4", quantity: 1, total: 50.0 },
-      { productId: "prod7", quantity: 1, total: 35.0 },
-      { productId: "prod6", quantity: 1, total: 12.0 },
-    ],
-    createdAt: "2025-01-11T11:30:00Z",
-    updatedAt: "2025-01-11T11:30:00Z",
-  },
+  // {
+  //   _id: "65f1a2b3c4d5e6f7g8h9i0j4",
+  //   userId: "user4",
+  //   Amount: 320.0,
+  //   shippingAddressId: "addr4",
+  //   paymentId: "pay4",
+  //   items: [
+  //     { productId: "prod3", quantity: 1, total: 150.0 },
+  //     { productId: "prod8", quantity: 1, total: 80.0 },
+  //     { productId: "prod7", quantity: 1, total: 35.0 },
+  //     { productId: "prod6", quantity: 3, total: 36.0 },
+  //     { productId: "prod2", quantity: 1, total: 15.0 },
+  //   ],
+  //   createdAt: "2025-01-12T16:20:00Z",
+  //   updatedAt: "2025-01-12T16:20:00Z",
+  // },
+  // {
+  //   _id: "65f1a2b3c4d5e6f7g8h9i0j5",
+  //   userId: "user5",
+  //   Amount: 95.0,
+  //   shippingAddressId: "addr5",
+  //   paymentId: "pay5",
+  //   items: [
+  //     { productId: "prod4", quantity: 1, total: 50.0 },
+  //     { productId: "prod7", quantity: 1, total: 35.0 },
+  //     { productId: "prod6", quantity: 1, total: 12.0 },
+  //   ],
+  //   createdAt: "2025-01-11T11:30:00Z",
+  //   updatedAt: "2025-01-11T11:30:00Z",
+  // },
 ]
 
 // Utility functions for working with sample data

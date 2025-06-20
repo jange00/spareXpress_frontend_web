@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getAllProductService} from "../../../services/admin/productService/getAllProductService"
 
-export const useAdminProduct = () => {
+export const useGetAllProduct = () => {
   const [pageNumber, setPageNumber] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [search, setSearch] = useState("");

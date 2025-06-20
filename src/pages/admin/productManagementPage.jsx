@@ -153,6 +153,7 @@ const ProductManagement = () => {
           updatedAt: new Date().toISOString(),
         }
         setProducts([...products, newProduct])
+        console.log(products)
       }
       setIsFormModalOpen(false)
       setEditingProduct(null)

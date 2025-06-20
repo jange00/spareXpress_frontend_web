@@ -6,7 +6,15 @@ import { Input } from "../../UIs/orderUi/Input"
 import { XIcon, PlusIcon, TrashIcon, CheckIcon } from "../../icons/Icons"
 import { sampleUsers, sampleProducts, sampleShippingAddresses, samplePayments } from "../sampleData1"
 
+// API mutation hook
+import { useGetAllPayment } from "../../../../hook/admin/usePayment/useGetAllPayment"
+import { useGetAllAdminUsers } from "../../../../hook/admin/useUsers/useGetAllAdminUsers"
+// import { useGetAllShippingAddress } from "../../../../hook/admin/useShippingAddress/useGetAllShippingAddress"
+import { useGetShippingByUserId } from "../../../../hook/admin/useShippingAddress/useGetShippingByUserId"
+import { useState } from "react"
+
 export const AddOrderModal = ({ onSave, onClose }) => {
+  const [userid,setUserId]=useState();
   const initialValues = {
     userId: "",
     Amount: 0,
@@ -15,9 +23,15 @@ export const AddOrderModal = ({ onSave, onClose }) => {
     items: [{ productId: "", quantity: 1, total: 0 }],
   }
 
-  const userOptions = sampleUsers.map((user) => ({
+  // Initialize product mutation
+  const { data: payments = [] } = useGetAllPayment();
+  const { data: users = [] } = useGetAllAdminUsers();
+  const { data: shippingAddresses = [] } = useGetShippingByUserId(userid);
+  // console.log(users)
+
+  const userOptions = users.map((user) => ({
     value: user._id,
-    label: `${user.name} (${user.email})`,
+    label: `${user.fullname} (${user.email})`,
   }))
 
   const productOptions = sampleProducts.map((product) => ({
@@ -25,19 +39,26 @@ export const AddOrderModal = ({ onSave, onClose }) => {
     label: `${product.name} - $${product.price}`,
   }))
 
-  const getShippingAddressOptions = (userId) => {
-    return sampleShippingAddresses
-      .filter((addr) => addr.userId === userId)
-      .map((addr) => ({
-        value: addr._id,
-        label: addr.address,
-      }))
-  }
+  // const getShippingAddressOptions = (userId) => {
+  //   return sampleShippingAddresses
+  //     .filter((addr) => addr.userId === userId)
+  //     .map((addr) => ({
+  //       value: addr._id,
+  //       label: addr.address,
+  //     }))
+  // }
 
-  const paymentOptions = samplePayments.map((payment) => ({
+  const getShippingAddressOptions = shippingAddresses.map((addr) => ({
+    value: addr._id,
+    label: `${addr.streetAddress}, ${addr.city}, ${addr.province}`,
+  }));
+
+  const paymentOptions = payments.map((payment) => ({
     value: payment._id,
-    label: `${payment.method} - $${payment.amount} (${payment.status})`,
+    label: `${payment.paymentMethod} - $${payment.amount} (${payment.paymentStatus})`,
   }))
+  
+
 
   const calculateTotal = (items) => {
     return items.reduce((sum, item) => sum + item.total, 0)
@@ -78,6 +99,7 @@ export const AddOrderModal = ({ onSave, onClose }) => {
                       label="Customer"
                       value={values.userId}
                       onChange={(e) => {
+                        setUserId(e.target.value)
                         setFieldValue("userId", e.target.value)
                         setFieldValue("shippingAddressId", "") // Reset shipping address when user changes
                       }}
@@ -92,7 +114,7 @@ export const AddOrderModal = ({ onSave, onClose }) => {
                       label="Shipping Address"
                       value={values.shippingAddressId}
                       onChange={(e) => setFieldValue("shippingAddressId", e.target.value)}
-                      options={getShippingAddressOptions(values.userId)}
+                      options={getShippingAddressOptions}
                       placeholder="Select shipping address"
                       error={
                         touched.shippingAddressId && errors.shippingAddressId ? errors.shippingAddressId : undefined

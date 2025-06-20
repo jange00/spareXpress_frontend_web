@@ -10,6 +10,9 @@ import {
   generateTrackingId,
 } from "../sampleData1"
 
+// API mutation hook
+import { useGetAllOrder } from "../../../../hook/admin/useOrder/useGetAllOrder"
+
 export const OrderDetailsModal = ({ order, onClose, onUpdate, onDelete }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [activeTab, setActiveTab] = useState("details")
@@ -24,6 +27,12 @@ export const OrderDetailsModal = ({ order, onClose, onUpdate, onDelete }) => {
     }
     return new Date(dateString).toLocaleDateString("en-US", options)
   }
+
+
+
+  // Initialize product mutation
+  const { data: orders = [] } = useGetAllOrder();
+  console.log(orders)
 
   // Helper functions to get referenced data
   const getUser = (userId) => sampleUsers.find((user) => user._id === userId)
@@ -157,7 +166,7 @@ export const OrderDetailsModal = ({ order, onClose, onUpdate, onDelete }) => {
                   <h3 className="font-medium text-gray-900">Customer Information</h3>
                   {user ? (
                     <div className="text-sm">
-                      <p className="font-medium">{user.name}</p>
+                      <p className="font-medium">{user.fullName}</p>
                       <p>{user.email}</p>
                       <p>{user.phone}</p>
                       <p className="text-gray-500">User ID: {order.userId}</p>
@@ -171,7 +180,7 @@ export const OrderDetailsModal = ({ order, onClose, onUpdate, onDelete }) => {
                   <h3 className="font-medium text-gray-900">Order Summary</h3>
                   <div className="text-sm">
                     <p>
-                      <span className="font-medium">Total Amount:</span> ${order.Amount.toFixed(2)}
+                      <span className="font-medium">Total Amount:</span> ${order.total}
                     </p>
                     <p>
                       <span className="font-medium">Items Count:</span> {order.items.length}
@@ -279,7 +288,7 @@ export const OrderDetailsModal = ({ order, onClose, onUpdate, onDelete }) => {
                     <td colSpan={3} className="px-6 py-3 text-right text-sm font-medium text-gray-900">
                       Grand Total:
                     </td>
-                    <td className="px-6 py-3 text-right text-sm font-bold text-gray-900">${order.Amount.toFixed(2)}</td>
+                    <td className="px-6 py-3 text-right text-sm font-bold text-gray-900">${order.total}</td>
                   </tr>
                 </tfoot>
               </table>

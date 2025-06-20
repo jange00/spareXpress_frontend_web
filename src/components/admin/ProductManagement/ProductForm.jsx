@@ -54,6 +54,38 @@ const ProductForm = ({
     // specificationsId: "",
     ...initialValues,
   };
+  const handleManualSubmit = (values) => {
+    console.log("Raw Formik Values:", values);
+  
+    const formData = new FormData();
+  
+    formData.append("name", values.name);
+    formData.append("price", values.price);
+    formData.append("categoryId", values.categoryId);
+    formData.append("subCategoryId", values.subCategoryId);
+    formData.append("brandId", values.brandId);
+    formData.append("description", values.description);
+    formData.append("stock", values.stock);
+    formData.append("shippingCharge", values.shippingCharge);
+    formData.append("discount", values.discount);
+  
+    // Append each image
+    values.image.forEach((img, index) => {
+      if (img instanceof File) {
+        formData.append("image", img);
+      }
+    });
+  
+    // 🔁 Log to verify
+    for (let pair of formData.entries()) {
+      console.log(pair[0], pair[1]);
+    }
+    console.log(formData)
+  
+    // Send to API
+    mutate(formData);
+  };
+  
 
   const handleCategoryChange = (categoryId, setFieldValue) => {
     console.log(categoryId);
@@ -96,17 +128,10 @@ const ProductForm = ({
   return (
     <div className="p-6">
       <Formik
-        initialValues={defaultValues}
-        validationSchema={productValidationSchema}
-        onSubmit={onSubmit}
-        // onSubmit={(values, { setSubmitting }) => {
-        //   mutate(values, {
-        //     onSettled: () => {
-        //       setSubmitting(false);
-        //     },
-        //   });
-        // }}
-        enableReinitialize
+       initialValues={defaultValues}
+       validationSchema={productValidationSchema}
+       onSubmit={(values) => handleManualSubmit(values)}
+       enableReinitialize
       >
         {({ values, errors, touched, setFieldValue, isSubmitting }) => (
           <Form className="space-y-8">
@@ -292,11 +317,8 @@ const ProductForm = ({
                     }
                     onChange={(e) => {
                       const files = Array.from(e.target.files);
-                      const imageUrls = files.map((file) =>
-                        URL.createObjectURL(file)
-                      );
-                      setFieldValue("image", [...values.image, ...imageUrls]);
-                      e.target.value = ""; 
+                      setFieldValue("image", [...values.image, ...files]);
+                      e.target.value = "";                    
                     }}
                     className="hidden"
                   />
@@ -368,7 +390,7 @@ const ProductForm = ({
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={isSubmitting || isLoading}>
+              <Button onClick={() => handleManualSubmit(values)} disabled={isSubmitting || isLoading}>
                 {isSubmitting || isLoading ? "Saving..." : "Save Product"}
               </Button>
             </div>

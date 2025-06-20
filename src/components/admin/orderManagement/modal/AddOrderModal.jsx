@@ -7,10 +7,13 @@ import { XIcon, PlusIcon, TrashIcon, CheckIcon } from "../../icons/Icons"
 import { sampleUsers, sampleProducts, sampleShippingAddresses, samplePayments } from "../sampleData1"
 
 // API mutation hook
-import { useGetAllPayment } from "../../../../hook/admin/usePayment/useGetAllPayment"
+// import { useGetAllPayment } from "../../../../hook/admin/usePayment/useGetAllPayment"
 import { useGetAllAdminUsers } from "../../../../hook/admin/useUsers/useGetAllAdminUsers"
 // import { useGetAllShippingAddress } from "../../../../hook/admin/useShippingAddress/useGetAllShippingAddress"
 import { useGetShippingByUserId } from "../../../../hook/admin/useShippingAddress/useGetShippingByUserId"
+import { useGetPaymentByUserId } from "../../../../hook/admin/usePayment/useGetPaymentByUserId"
+import { useGetAllProduct } from "../../../../hook/admin/useProduct/useGetAllProduct"
+import { usePostOrder } from "../../../../hook/admin/useOrder/usePostOrder"
 import { useState } from "react"
 
 export const AddOrderModal = ({ onSave, onClose }) => {
@@ -24,9 +27,12 @@ export const AddOrderModal = ({ onSave, onClose }) => {
   }
 
   // Initialize product mutation
-  const { data: payments = [] } = useGetAllPayment();
+  const { data: payments = [] } = useGetPaymentByUserId(userid);
+  // console.log(payments)
   const { data: users = [] } = useGetAllAdminUsers();
   const { data: shippingAddresses = [] } = useGetShippingByUserId(userid);
+  const { data: products = [] } = useGetAllProduct();
+  const { mutate, isLoading: isSubmitting } = usePostOrder();
   // console.log(users)
 
   const userOptions = users.map((user) => ({
@@ -34,7 +40,7 @@ export const AddOrderModal = ({ onSave, onClose }) => {
     label: `${user.fullname} (${user.email})`,
   }))
 
-  const productOptions = sampleProducts.map((product) => ({
+  const productOptions = products.map((product) => ({
     value: product._id,
     label: `${product.name} - $${product.price}`,
   }))
@@ -65,17 +71,46 @@ export const AddOrderModal = ({ onSave, onClose }) => {
   }
 
   const getProductPrice = (productId) => {
-    const product = sampleProducts.find((p) => p._id === productId)
+    const product = products.find((p) => p._id === productId)
     return product ? product.price : 0
   }
 
-  const handleSubmit = (values) => {
-    const totalAmount = calculateTotal(values.items)
-    onSave({
-      ...values,
-      Amount: totalAmount,
-    })
-  }
+  const handleManualSubmit = (values) => {
+    const totalAmount = calculateTotal(values.items);
+  
+    const formData = new FormData();
+  
+    // Basic order info
+    // formData.append("userId", values.userId);
+    formData.append("shippingAddressId", values.shippingAddressId);
+    formData.append("paymentMethodId", values.paymentId);
+    formData.append("Amount", totalAmount);
+  
+    // Append order items as JSON string
+    formData.append("items", JSON.stringify(values.items.map(item => ({
+      productId: item.productId,
+      quantity: item.quantity,
+      total: item.total,
+    }))));
+  
+  
+    // 🔁 Debug: Log contents
+    for (let pair of formData.entries()) {
+      console.log(pair[0], pair[1]);
+    }
+  
+    // Call backend mutation
+    mutate(formData, {
+      onSuccess: () => {
+        onSave?.();
+        onClose?.();
+      },
+      onError: (err) => {
+        console.error("Order creation failed:", err);
+      },
+    });
+  };
+  
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-md flex items-center justify-center z-40 p-4">
@@ -87,7 +122,7 @@ export const AddOrderModal = ({ onSave, onClose }) => {
           </button>
         </div>
 
-        <Formik initialValues={initialValues} validationSchema={addOrderValidationSchema} onSubmit={handleSubmit}>
+        <Formik initialValues={initialValues} validationSchema={addOrderValidationSchema} onSubmit={handleManualSubmit}>
           {({ values, errors, touched, setFieldValue }) => (
             <Form>
               <div className="p-6 overflow-y-auto max-h-[calc(90vh-12rem)]">

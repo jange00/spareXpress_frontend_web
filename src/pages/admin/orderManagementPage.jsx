@@ -15,6 +15,7 @@ import {
   generateOrderId,
 } from "../../components/admin/orderManagement/sampleData1"
 
+
 import { useGetAllOrder } from "../../hook/admin/useOrder/useGetAllOrder"
 
 export const OrderManagement = () => {
@@ -125,7 +126,7 @@ export const OrderManagement = () => {
   }
 
   const handleDeleteOrder = (orderId) => {
-    setOrders(orders.filter((order) => order._id !== orderId))
+    // setOrders(orders.filter((order) => order._id !== orderId))
     if (selectedOrders.includes(orderId)) {
       setSelectedOrders(selectedOrders.filter((id) => id !== orderId))
     }
@@ -139,7 +140,7 @@ export const OrderManagement = () => {
       updatedAt: new Date().toISOString(),
     }
 
-    setOrders([order, ...orders])
+    // setOrders([order, ...orders])
     setIsAddOrderOpen(false)
   }
 
@@ -399,7 +400,7 @@ export const OrderManagement = () => {
                   </tr>
                 ) : (
                   filteredOrders.map((order) => {
-                    console.log(order)
+                    console.log("Order ID:", order._id, "Items:", order.items)
                     const user = order.customer
                     const payment = getPayment(order.paymentId)
                     return (
@@ -416,22 +417,19 @@ export const OrderManagement = () => {
                           <div className="text-sm font-medium text-gray-900">{order._id}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          {user ? (
+
                             <div>
-                              <div className="text-sm font-medium text-gray-900">{user.fullname
-                              }</div>
-                              <div className="text-sm text-gray-500">{user.email}</div>
+                              <div className="text-sm font-medium text-gray-900">{order.userId.fullname}</div>
+                              <div className="text-sm text-gray-500">{order.userId.email}</div>
                             </div>
-                          ) : (
-                            <div className="text-sm text-gray-500">User ID: {order.userId}</div>
-                          )}
+                          
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">{formatDate(order.date
+                          <div className="text-sm text-gray-900">{formatDate(order.createdAt
 )}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-gray-900">${order.total}</div>
+                          <div className="text-sm font-medium text-gray-900">${order.Amount}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm text-gray-900">{order.items.length} items</div>
@@ -442,14 +440,14 @@ export const OrderManagement = () => {
 
                               <div
                                 className={`text-sm ${
-                                  order.paymentStatus === "completed"
+                                  order.paymentMethodId === "completed"
                                     ? "text-green-600"
-                                    : order.paymentStatus === "pending"
+                                    : order.paymentMethodId === "pending"
                                       ? "text-yellow-600"
                                       : "text-red-600"
                                 }`}
                               >
-                                {order.paymentStatus}
+                                {order.paymentMethodId.paymentStatus}
                               </div>
                             </div>
                         

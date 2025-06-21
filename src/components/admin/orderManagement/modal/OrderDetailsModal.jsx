@@ -1,20 +1,20 @@
 import { useState } from "react"
 import { Button } from "../../UIs/orderUi/Button1"
 import { PrinterIcon, TruckIcon, RefreshIcon } from "../../icons/Icons"
-import {
-  sampleUsers,
-  sampleProducts,
-  sampleShippingAddresses,
-  samplePayments,
-  printInvoice,
-  generateTrackingId,
-} from "../sampleData1"
+// import {
+//   sampleUsers,
+//   sampleProducts,
+//   sampleShippingAddresses,
+//   samplePayments,
+//   printInvoice,
+//   generateTrackingId,
+// } from "../sampleData1"
 
 // API mutation hook
 import { useGetAllOrder } from "../../../../hook/admin/useOrder/useGetAllOrder"
 
 export const OrderDetailsModal = ({ order, onClose, onUpdate, onDelete }) => {
-  console.log(order)
+  // console.log(order)
   const [isLoading, setIsLoading] = useState(false)
   const [activeTab, setActiveTab] = useState("details")
 
@@ -33,7 +33,7 @@ export const OrderDetailsModal = ({ order, onClose, onUpdate, onDelete }) => {
 
   // Initialize product mutation
   const { data: orders = [] } = useGetAllOrder();
-  console.log(orders)
+  // console.log(orders)
 
   // Helper functions to get referenced data
   const getUser = (userId) => sampleUsers.find((user) => user._id === userId)

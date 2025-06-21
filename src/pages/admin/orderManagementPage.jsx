@@ -398,7 +398,7 @@ export const OrderManagement = () => {
                   </tr>
                 ) : (
                   filteredOrders.map((order) => {
-                    console.log("Order ID:", order._id, "Items:", order.items)
+                    // console.log("Order ID:", order._id, "Items:", order.items)
                     const user = order.customer
                     const payment = getPayment(order.paymentId)
                     return (

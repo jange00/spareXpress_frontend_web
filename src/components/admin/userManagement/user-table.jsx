@@ -2,6 +2,7 @@ import { useState } from "react"
 import Badge from "../UIs/adminUserUi/badge"
 import { formatDate } from "../utils/adminUser/helpers"
 
+
 const UserTable = ({
   users = [],
   selectedUsers = [],
@@ -11,8 +12,13 @@ const UserTable = ({
   onEditUser,
   onDeleteUser,
   onUpdateStatus,
+
 }) => {
   const [dropdownOpen, setDropdownOpen] = useState(null)
+
+
+
+  
 
   const getStatusBadge = (status) => {
     const statusConfig = {
@@ -20,6 +26,7 @@ const UserTable = ({
       banned: { color: "red", label: "Banned" },
       pending: { color: "yellow", label: "Pending" },
     }
+
 
     const config = statusConfig[status] || { color: "gray", label: status }
     return <Badge color={config.color}>{config.label}</Badge>
@@ -113,7 +120,8 @@ const UserTable = ({
                     <div className="text-sm text-gray-900">{user.orders || 0}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">${(user.totalSpent || 0).toFixed(2)}</div>
+                    {/* <div className="text-sm text-gray-900">₹{(users.Amount || 0).toFixed(2)}</div> */}
+                    <div className="text-sm text-gray-900">₹{(users.Amount || 0).toFixed(2)}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right">
                     <div className="flex items-center justify-end space-x-2">
@@ -178,7 +186,7 @@ const UserTable = ({
                               </button>
                               <button
                                 onClick={() => {
-                                  onEditUser(user)
+                                  onEditUser(user._id)
                                   setDropdownOpen(null)
                                 }}
                                 className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"

@@ -3,20 +3,22 @@ import UserTable from "../../components/admin/userManagement/user-table"
 import AddUserModal from "../../components/admin/userManagement/modals/add-user-modal"
 import EditUserModal from "../../components/admin/userManagement/modals/edit-user-modal"
 import BulkActionModal from "../../components/admin/userManagement/modals/bulk-action-modal"
-// import UserProfileModal from "../../components/admin/userManagement/userProfileModal"
 import UserProfileModal from "../../components/admin/userManagement/user-profile-modal"
 import UserManagementHeader from "../../components/admin/userManagement/user-management-header"
 import UserManagementFilters from "../../components/admin/userManagement/user-management-filters"
 import ExportDropdown from "../../components/admin/userManagement/export-dropdown"
 import { exportToCSV, exportToExcel, exportToPDF, importFromCSV } from "../../components/admin/utils/adminUser/export-utils"
 
-// Import mock data functions (easy to replace with real API calls)
-import { getAllUsers, createUser, updateUser, deleteUser, bulkUpdateUsers } from "../../components/admin/userManagement/mock-data"
+import { getAllUsers, createUser, updateUser, deleteUser as deleteUserMock, bulkUpdateUsers } from "../../components/admin/userManagement/mock-data"
+
+import { useGetAllAdminUsers } from "../../hook/admin/useUsers/useGetAllAdminUsers"
+import { useDeleteAdminUsers } from "../../hook/admin/useUsers/useDeleteAdminUsers"
 
 const UserManagement = () => {
-  // State
-  const [users, setUsers] = useState([])
-  const [filteredUsers, setFilteredUsers] = useState([])
+  const { data: user = [] } = useGetAllAdminUsers();
+
+  const [users, setUsers] = useState(user)
+  const [filteredUsers, setFilteredUsers] = useState(user)
   const [selectedUsers, setSelectedUsers] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
@@ -29,26 +31,8 @@ const UserManagement = () => {
   })
   const [currentUser, setCurrentUser] = useState(null)
 
-  // Initialize data - Easy to replace with real API call
-  useEffect(() => {
-    const fetchUsers = async () => {
-      setIsLoading(true)
-      try {
-        const response = await getAllUsers() // This simulates API call
-        if (response.success) {
-          setUsers(response.data)
-          setFilteredUsers(response.data)
-        }
-      } catch (error) {
-        console.error("Error fetching users:", error)
-        alert("Error loading users. Please try again.")
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    fetchUsers()
-  }, [])
+  // NEW: state to manage delete confirmation overlay
+  const [confirmDelete, setConfirmDelete] = useState(null) // null or user object to delete
 
   // Filter users
   useEffect(() => {
@@ -93,16 +77,15 @@ const UserManagement = () => {
     setSelectedUsers((prev) => (prev.length === filteredUsers.length ? [] : filteredUsers.map((user) => user._id)))
   }
 
-  // CRUD operations - Easy to replace with real API calls
+  // CRUD operations
   const handleAddUser = async (userData) => {
     setIsLoading(true)
     try {
-      // This simulates API call - easy to replace with real API
       const response = await createUser({
         ...userData,
         status: "active",
         orders: 0,
-        totalSpent: 0,
+        Amount: 0,
         lastLogin: null,
       })
 
@@ -121,7 +104,6 @@ const UserManagement = () => {
   const handleEditUser = async (userData) => {
     setIsLoading(true)
     try {
-      // This simulates API call - easy to replace with real API
       const response = await updateUser(userData._id, userData)
 
       if (response.success) {
@@ -136,30 +118,45 @@ const UserManagement = () => {
     }
   }
 
+  const { mutateAsync: deleteUser } = useDeleteAdminUsers();
+
+  // Show confirmation overlay instead of window.confirm
   const handleDeleteUser = async (userId) => {
     const user = users.find((u) => u._id === userId)
-    if (window.confirm(`Are you sure you want to delete "${user?.fullname}"? This action cannot be undone.`)) {
-      try {
-        // This simulates API call - easy to replace with real API
-        const response = await deleteUser(userId)
+    if (!user) return
+    // Open confirm overlay with this user
+    setConfirmDelete(user)
+  }
 
-        if (response.success) {
-          setUsers((prev) => prev.filter((user) => user._id !== userId))
-          setSelectedUsers((prev) => prev.filter((id) => id !== userId))
-          alert("User deleted successfully.")
-        }
-      } catch (error) {
-        console.error("Error deleting user:", error)
-        alert("Error deleting user. Please try again.")
+  // Confirm delete action from overlay
+  const confirmDeleteUser = async () => {
+    if (!confirmDelete) return
+    setIsLoading(true)
+    try {
+      const response = await deleteUser(confirmDelete._id)
+
+      if (response.success) {
+        setUsers((prev) => prev.filter((user) => user._id !== confirmDelete._id))
+        setSelectedUsers((prev) => prev.filter((id) => id !== confirmDelete._id))
+        // alert("User deleted successfully.")
       }
+    } catch (error) {
+      console.error("Error deleting user:", error)
+      // alert("Error deleting user. Please try again.")
+    } finally {
+      setIsLoading(false)
+      setConfirmDelete(null)
     }
+  }
+
+  const cancelDeleteUser = () => {
+    setConfirmDelete(null)
   }
 
   const handleUpdateStatus = async (userId, newStatus) => {
     try {
       const user = users.find((u) => u._id === userId)
 
-      // This simulates API call - easy to replace with real API
       const response = await updateUser(userId, { ...user, status: newStatus })
 
       if (response.success) {
@@ -183,7 +180,6 @@ const UserManagement = () => {
 
       if (action === "delete") {
         if (window.confirm(`Are you sure you want to delete ${userIds.length} users? This action cannot be undone.`)) {
-          // This simulates API call - easy to replace with real API
           const response = await bulkUpdateUsers(userIds, { action: "delete" })
 
           if (response.success) {
@@ -195,7 +191,6 @@ const UserManagement = () => {
       } else if (action === "activate" || action === "ban") {
         const newStatus = action === "activate" ? "active" : "banned"
 
-        // This simulates API call - easy to replace with real API
         const response = await bulkUpdateUsers(userIds, { status: newStatus })
 
         if (response.success) {
@@ -216,7 +211,7 @@ const UserManagement = () => {
     }
   }
 
-  // Export/Import
+  // Export/Import functions unchanged
   const handleExport = (format) => {
     try {
       const filename = `users-export-${new Date().toISOString().split("T")[0]}`
@@ -253,7 +248,7 @@ const UserManagement = () => {
             updatedAt: new Date().toISOString(),
             lastLogin: null,
             orders: 0,
-            totalSpent: 0,
+            Amount: 0,
           }))
           setUsers((prev) => [...newUsers, ...prev])
           alert(`Successfully imported ${newUsers.length} users!`)
@@ -276,7 +271,7 @@ const UserManagement = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 relative">
       {/* Header */}
       <UserManagementHeader onAddUser={() => openModal("addUser")} onImport={handleImport} isLoading={isLoading}>
         <ExportDropdown onExport={handleExport} isLoading={isLoading} />
@@ -385,6 +380,34 @@ const UserManagement = () => {
         onUpdateStatus={handleUpdateStatus}
         onDelete={handleDeleteUser}
       />
+
+      {/* Delete Confirmation Overlay */}
+      {confirmDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full mx-4">
+            <h2 className="text-lg font-semibold mb-4">Confirm Delete</h2>
+            <p className="mb-6">
+              Are you sure you want to delete <strong>{confirmDelete.fullname}</strong>? This action cannot be undone.
+            </p>
+            <div className="flex justify-end space-x-4">
+              <button
+                onClick={cancelDeleteUser}
+                className="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 transition"
+                disabled={isLoading}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDeleteUser}
+                className="px-4 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 transition"
+                disabled={isLoading}
+              >
+                {isLoading ? "Deleting..." : "Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

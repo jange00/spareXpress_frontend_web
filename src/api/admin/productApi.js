@@ -1,8 +1,8 @@
 import axios from "../api";
 
-export const postProductApi = (params) => axios.post("/products", params, { headers: {
+export const postProductApi = (params) => axios.post("/admin/products", params, { headers: {
     "Content-Type": "multipart/form-data",
   },})
-export const getAllProductApi = (params) => axios.get("/products", {params})
-export const updateProductApi = (id,params) => axios.put(`/products/${id}`, {params})
-export const deleteProductApi = (id, params) => axios.delete(`/products/${id}`, {params})
+export const getAllProductApi = (params) => axios.get("/admin/products", {params})
+export const updateProductApi = (id, params) => axios.put(`/admin/products/${id}`, params);
+export const deleteProductApi = (id, params) => axios.delete(`/admin/products/${id}`, {params})

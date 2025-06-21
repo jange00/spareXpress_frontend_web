@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react"
-import {
-  mockProducts,
-  mockCategories,
-  mockBrands,
-  getCategoryName,
-  getBrandName,
-} from "../../components/admin/ProductManagement/mockData"
+// import {
+//   mockProducts,
+//   mockCategories,
+//   mockBrands,
+//   getCategoryName,
+//   getBrandName,
+// } from "../../components/admin/ProductManagement/mockData"
 import ProductTable from "../../components/admin/ProductManagement/ProductTables"
 import Button from "../../components/admin/UIs/productUI/Button"
 import Input from "../../components/admin/UIs/productUI/Input"
@@ -25,10 +25,19 @@ import {
   AlertTriangleIcon,
 } from "../../components/admin/icons/Icons"
 
+// API mutation hook
+import { useGetAllProduct } from "../../hook/admin/useProduct/useGetAllProduct"
+import { useGetAllCategory } from "../../hook/admin/useCategory/useGetAllCategory"
+import { useGetAllBrand } from "../../hook/admin/useBrands/useGetAllBrand"
+import { useGetAllSubCategory } from "../../hook/admin/useSubCategory/useGetAllSubCategory"
+import { useDeleteProduct } from "../../hook/admin/useProduct/useDeleteProduct"
+import { useUpdateProduct } from "../../hook/admin/useProduct/useUpdateProduct"
+
 const ProductManagement = () => {
+  const { data: product = [] } = useGetAllProduct();
   // State management
-  const [products, setProducts] = useState(mockProducts)
-  const [filteredProducts, setFilteredProducts] = useState(mockProducts)
+  const [products, setProducts] = useState(product)
+  const [filteredProducts, setFilteredProducts] = useState(product)
   const [loading, setLoading] = useState(false)
 
   // Filter states
@@ -47,6 +56,28 @@ const ProductManagement = () => {
   // Selection states
   const [selectedProducts, setSelectedProducts] = useState([])
   const [selectAll, setSelectAll] = useState(false)
+
+
+    // Helper functions
+    const getCategoryName = (categoryId) => {
+      const category = categories.find((cat) => cat._id === categoryId)
+      return category ? category.title : "Unknown"
+    }
+    
+    // const getSubcategoryName = (subCategoryId) => {
+    //   const subcategory = sub.find((sub) => sub._id === subCategoryId)
+    //   return subcategory ? subCategory.title : "Unknown"
+    // }
+    
+    const getBrandName = (brandId) => {
+      const brand = brands.find((brand) => brand._id === brandId)
+      return brand ? brand.title : "Unknown"
+    }
+    
+    // const getSubcategoriesByCategory = (categoryId) => {
+    //   return mockSubcategories.filter((sub) => sub.categoryId === categoryId)
+    // }
+
 
   // Filter and sort products
   useEffect(() => {
@@ -73,7 +104,8 @@ const ProductManagement = () => {
           product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
           product.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
           getCategoryName(product.categoryId).toLowerCase().includes(searchTerm.toLowerCase()) ||
-          getBrandName(product.brandId).toLowerCase().includes(searchTerm.toLowerCase()),
+          getBrandName(product.brandId).toLowerCase().includes(searchTerm.toLowerCase()) ,
+          // getSubcategoryName(product.subCategoryId).toLowerCase().includes(searchTerm.toLowerCase()) ,
       )
     }
 
@@ -129,21 +161,37 @@ const ProductManagement = () => {
     setIsViewModalOpen(true)
   }
 
+  const { mutate: updateProduct } = useUpdateProduct();
+
   const handleSaveProduct = async (formData) => {
-    setLoading(true)
-
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
+    setLoading(true);
+  
     try {
       if (editingProduct) {
-        // Update existing product
-        const updatedProduct = {
-          ...editingProduct,
-          ...formData,
-          updatedAt: new Date().toISOString(),
-        }
-        setProducts(products.map((p) => (p._id === editingProduct._id ? updatedProduct : p)))
+        // ✅ Call backend API to update
+        updateProduct(
+          { id: editingProduct._id, updatedProduct: formData },
+          {
+            onSuccess: () => {
+              setProducts((prev) =>
+                prev.map((p) =>
+                  p._id === editingProduct._id
+                    ? { ...p, ...formData, updatedAt: new Date().toISOString() }
+                    : p
+                )
+              );
+              setIsFormModalOpen(false);
+              setEditingProduct(null);
+            },
+            onError: (error) => {
+              console.error("Update failed:", error);
+              alert("Failed to update product");
+            },
+            onSettled: () => {
+              setLoading(false);
+            }
+          }
+        );
       } else {
         // Create new product
         const newProduct = {
@@ -151,26 +199,34 @@ const ProductManagement = () => {
           _id: `prod${Date.now()}`,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
-        }
-        setProducts([...products, newProduct])
-        console.log(products)
+        };
+        setProducts([...products, newProduct]);
+        setIsFormModalOpen(false);
       }
-      setIsFormModalOpen(false)
-      setEditingProduct(null)
     } catch (error) {
-      console.error("Error saving product:", error)
-      alert("Failed to save product")
-    } finally {
-      setLoading(false)
+      console.error("Error saving product:", error);
+      alert("Failed to save product");
+      setLoading(false);
     }
-  }
+  };
+  
 
+  const { mutate: deleteProduct } = useDeleteProduct()
   const handleDeleteProduct = (productId) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
-      setProducts(products.filter((p) => p._id !== productId))
-      setSelectedProducts(selectedProducts.filter((id) => id !== productId))
+      deleteProduct(productId, {
+        onSuccess: () => {
+          setProducts((prev) => prev.filter((p) => p._id !== productId))
+          setSelectedProducts((prev) => prev.filter((id) => id !== productId))
+        },
+        onError: (error) => {
+          console.error("Delete error:", error)
+          alert("Failed to delete product. Please try again.")
+        }
+      })
     }
   }
+  
 
   // Selection handlers
   const handleSelectProduct = (productId) => {
@@ -247,19 +303,30 @@ const ProductManagement = () => {
   }
 
   // Prepare dropdown options
+  const { data: categories = [] } = useGetAllCategory();
   const categoryOptions = [
     { value: "", label: "All Categories" },
-    ...mockCategories.map((cat) => ({
+    ...categories.map((cat) => ({
       value: cat._id,
-      label: cat.name,
+      label: cat.title,
     })),
   ]
 
+  const { data: subCategories = [] } = useGetAllSubCategory
+  const subCategoriesOptions = [
+    { value: "", label: "All SubCategories"},
+    ...subCategories.map((subCategories) => ({
+      value: subCategories._id,
+      label: subCategories.title,
+    }))
+  ]
+
+  const { data: brands = [] } = useGetAllBrand();
   const brandOptions = [
     { value: "", label: "All Brands" },
-    ...mockBrands.map((brand) => ({
+    ...brands.map((brand) => ({
       value: brand._id,
-      label: brand.name,
+      label: brand.title,
     })),
   ]
 
@@ -292,7 +359,7 @@ const ProductManagement = () => {
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Product Management</h1>
-              <p className="mt-1 text-sm text-gray-500">Manage your product inventory and details</p>
+              {/* <p className="mt-1 text-sm text-gray-500">Manage your product inventory and details</p> */}
             </div>
 
             {/* Quick Actions */}

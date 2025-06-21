@@ -1,7 +1,8 @@
 import Button from "../UIs/productUI/Button"
 import Badge from "../UIs/productUI/Badge"
 import { EditIcon, TrashIcon, EyeIcon } from "../icons/Icons"
-import { getCategoryName, getSubcategoryName, getBrandName } from "./mockData"
+// import { getCategoryName, getSubcategoryName, getBrandName } from "../../../pages/admin/productManagementPage"
+
 
 const ProductTable = ({
   products,
@@ -118,11 +119,11 @@ const ProductTable = ({
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{getCategoryName(product.categoryId)}</div>
-                      <div className="text-sm text-gray-500">{getSubcategoryName(product.subCategoryId)}</div>
+                      <div className="text-sm text-gray-900">{product.categoryId.title}</div>
+                      {/* <div className="text-sm text-gray-500">{products.subCategoryId.title}</div> */}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">{getBrandName(product.brandId)}</div>
+                      <div className="text-sm font-medium text-gray-900">{product.brandId.title}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">

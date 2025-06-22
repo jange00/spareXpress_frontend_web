@@ -2,7 +2,7 @@ import React from "react";
 import { Link, NavLink } from "react-router-dom";
 import { 
   BarChart3, Box, CreditCard, LayoutDashboard, 
-  Package, Settings, ShoppingCart, Users, Truck
+  Package, Settings, ShoppingCart, Users, Truck, Boxes, ListTree, BadgeCheck
 } from "lucide-react";
 
 const navItems = [
@@ -13,7 +13,10 @@ const navItems = [
   { id: "inventory", label: "Inventory & Stock", icon: Box },
   { id: "payments", label: "Payment & Transactions", icon: CreditCard },
   { id: "reports", label: "Reports & Analytics", icon: BarChart3 },
-  { id: "delivery", label: "Delivery", icon: Truck }, // Added Delivery option
+  { id: "delivery", label: "Delivery", icon: Truck },
+  { id: "admin-add-category", label: "Add Category", icon: Boxes },
+  { id: "admin-add-Subcategory", label: "Add Sub Category", icon: ListTree },
+  { id: "admin-add-brands", label: "Add Brand", icon: BadgeCheck },
   { id: "settings", label: "Settings", icon: Settings },
  
 ];

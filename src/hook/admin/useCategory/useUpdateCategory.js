@@ -5,14 +5,14 @@ export const useUpdateCategory = () => {
   const queryClient = useQueryClient();
 
   return useMutation(
-    ({ id, updateCategory }) => updateCategoryService(id, updateCategory), 
-  {
-    onSuccess: () => {
-      queryClient.invalidateQueries(["admin_category"]);
-    },
-    onError: (error) => {
-      console.error("Category update error:", error);
-    },
-  }
-);
+    ({ id, updateCategory }) => updateCategoryService(id, updateCategory),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(['admin_category']);
+      },
+      onError: (error) => {
+        console.error('Category update error:', error);
+      },
+    }
+  );
 };

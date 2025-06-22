@@ -6,73 +6,18 @@ import ActionButtons from "../../components/admin/UIs/addCategoryUi/ActionButton
 import Modal from "../../components/admin/UIs/addCategoryUi/Modal"
 import { filterCategories, exportToCSV, exportToExcel, exportToPDF } from "../../components/admin/utils/addCategory/category-utils"
 
-// Mock data - replace with actual API calls
-const mockCategories = [
-  {
-    _id: "1",
-    title: "Electronics",
-    createdAt: "2024-01-15T10:30:00Z",
-    updatedAt: "2024-01-15T10:30:00Z",
-  },
-  {
-    _id: "2",
-    title: "Clothing",
-    createdAt: "2024-01-14T14:20:00Z",
-    updatedAt: "2024-01-16T09:15:00Z",
-  },
-  {
-    _id: "3",
-    title: "Home & Garden",
-    createdAt: "2024-01-13T16:45:00Z",
-    updatedAt: "2024-01-13T16:45:00Z",
-  },
-  {
-    _id: "4",
-    title: "Sports & Outdoors",
-    createdAt: "2024-01-12T11:20:00Z",
-    updatedAt: "2024-01-12T11:20:00Z",
-  },
-  {
-    _id: "5",
-    title: "Books & Media",
-    createdAt: "2024-01-11T15:30:00Z",
-    updatedAt: "2024-01-11T15:30:00Z",
-  },
-  {
-    _id: "1",
-    title: "Electronics",
-    createdAt: "2024-01-15T10:30:00Z",
-    updatedAt: "2024-01-15T10:30:00Z",
-  },
-  {
-    _id: "2",
-    title: "Clothing",
-    createdAt: "2024-01-14T14:20:00Z",
-    updatedAt: "2024-01-16T09:15:00Z",
-  },
-  {
-    _id: "3",
-    title: "Home & Garden",
-    createdAt: "2024-01-13T16:45:00Z",
-    updatedAt: "2024-01-13T16:45:00Z",
-  },
-  {
-    _id: "4",
-    title: "Sports & Outdoors",
-    createdAt: "2024-01-12T11:20:00Z",
-    updatedAt: "2024-01-12T11:20:00Z",
-  },
-  {
-    _id: "5",
-    title: "Books & Media",
-    createdAt: "2024-01-11T15:30:00Z",
-    updatedAt: "2024-01-11T15:30:00Z",
-  },
-]
+// API mutation hook
+import { usePostCategory } from "../../hook/admin/useCategory/usePostCategory"
+import { useGetAllCategory } from "../../hook/admin/useCategory/useGetAllCategory"
+import { useDeleteCategory } from "../../hook/admin/useCategory/useDeleteCategory"
 
 export default function AddCategoriesPage() {
-  const [categories, setCategories] = useState(mockCategories)
-  const [filteredCategories, setFilteredCategories] = useState(mockCategories)
+  const { data: category = [] } = useGetAllCategory()
+  const { mutateAsync: deleteCategory } = useDeleteCategory();
+  // const { mutateAsync: updateCategory } = useUpdateCategory();
+
+  const [categories, setCategories] = useState(category)
+  const [filteredCategories, setFilteredCategories] = useState(category)
   const [selectedCategories, setSelectedCategories] = useState([])
   const [searchTerm, setSearchTerm] = useState("")
   const [sortBy, setSortBy] = useState("createdAt")
@@ -82,6 +27,10 @@ export default function AddCategoriesPage() {
   const [editingCategory, setEditingCategory] = useState(null)
   const [showAddModal, setShowAddModal] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
+
+  // Mutation hooks
+  const { mutateAsync: addCategory, isLoading: isAdding } = usePostCategory()
+  
 
   // Apply filters whenever categories or filters change
   useEffect(() => {
@@ -96,27 +45,13 @@ export default function AddCategoriesPage() {
   }, [categories, searchTerm, sortBy, sortOrder, statusFilter])
 
   const handleAddCategory = async (formData) => {
-    setIsSubmitting(true)
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      const newCategory = {
-        _id: Date.now().toString(),
-        title: formData.title,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      }
-
-      setCategories((prev) => [newCategory, ...prev])
+      const newCat = await addCategory(formData)
+      setCategories((prev) => [newCat, ...prev])
       setShowAddModal(false)
-
-      // Show success notification
       alert("Category added successfully!")
     } catch (error) {
       alert("Failed to add category. Please try again.")
-    } finally {
-      setIsSubmitting(false)
     }
   }
 
@@ -126,37 +61,46 @@ export default function AddCategoriesPage() {
   }
 
   const handleUpdateCategory = async (formData) => {
-    setIsSubmitting(true)
+    if (!editingCategory) return;
+    setIsSubmitting(true);
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
+      // Pass keys exactly as hook expects
+      const updatedCat = await updateCategory({ id: editingCategory._id, updateCategory: formData });
+  
       setCategories((prev) =>
-        prev.map((cat) =>
-          cat._id === editingCategory._id
-            ? { ...cat, title: formData.title, updatedAt: new Date().toISOString() }
-            : cat,
-        ),
-      )
-
-      setShowEditModal(false)
-      setEditingCategory(null)
-      alert("Category updated successfully!")
+        prev.map((cat) => (cat._id === editingCategory._id ? updatedCat : cat))
+      );
+  
+      setShowEditModal(false);
+      setEditingCategory(null);
+      alert("Category updated successfully!");
     } catch (error) {
-      alert("Failed to update category. Please try again.")
+      console.error("Update failed", error);
+      alert("Failed to update category. Please try again.");
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
+  
 
-  const handleDeleteCategory = (categoryId) => {
-    const category = categories.find((c) => c._id === categoryId)
-    if (category) {
-      setCategories((prev) => prev.filter((c) => c._id !== categoryId))
-      setSelectedCategories((prev) => prev.filter((id) => id !== categoryId))
-      alert(`Category "${category.title}" has been deleted.`)
+  const handleDeleteCategory = async (categoryId) => {
+    const category = categories.find((c) => c._id === categoryId);
+    if (!category) return;
+  
+    const confirmDelete = window.confirm(`Are you sure you want to delete "${category.title}"?`);
+    if (!confirmDelete) return;
+  
+    try {
+      await deleteCategory(categoryId); // call mutation as promise
+  
+      setCategories((prev) => prev.filter((c) => c._id !== categoryId));
+      setSelectedCategories((prev) => prev.filter((id) => id !== categoryId));
+      alert(`Category "${category.title}" deleted successfully.`);
+    } catch (error) {
+      console.error("Failed to delete category:", error);
+      alert("Failed to delete category. Please try again.");
     }
-  }
+  };
 
   const handleBulkDelete = (categoryIds) => {
     setCategories((prev) => prev.filter((c) => !categoryIds.includes(c._id)))

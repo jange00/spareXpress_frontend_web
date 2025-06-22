@@ -4,7 +4,8 @@ import { postCategoryService } from "../../../services/admin/categoryService/pos
 export const usePostCategory = () => {
   const queryClient = useQueryClient();
 
-  return useMutation(postCategoryService, {
+  return useMutation({
+    mutationFn: postCategoryService,
     onSuccess: () => {
       queryClient.invalidateQueries(["admin_category"]);
     },

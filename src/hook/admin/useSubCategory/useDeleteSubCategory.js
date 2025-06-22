@@ -4,7 +4,8 @@ import { deleteSubCategoryService } from "../../../services/admin/subCategorySer
 export const useDeleteSubCategory = () => {
   const queryClient = useQueryClient();
 
-  return useMutation(({ id, params }) => deleteSubCategoryService(id, params), {
+  return useMutation({
+    mutationFn: ({ id, params }) => deleteSubCategoryService(id, params),
     onSuccess: () => {
       queryClient.invalidateQueries(["admin_subcategory"]);
     },

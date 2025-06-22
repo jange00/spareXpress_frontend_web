@@ -6,17 +6,12 @@ import { Select } from "../UIs/addSubCategoryUi/Select"
 import { subcategoryValidationSchema } from "../utils/addSubCategory/subcategoryValidation"
 import { X } from "lucide-react"
 
-// Mock categories - replace with your actual data
-const mockCategories = [
-    { _id: "cat_1", name: "Electronics", icon: "🔌" },
-    { _id: "cat_2", name: "Clothing", icon: "👕" },
-    { _id: "cat_3", name: "Home & Garden", icon: "🏠" },
-    { _id: "cat_4", name: "Sports & Outdoors", icon: "⚽" },
-  ]
+
+import { useGetAllCategory } from "../../../hook/admin/useCategory/useGetAllCategory"
   
   export const EditSubcategoryModal = ({ subcategory, onSave, onClose }) => {
     const [isSubmitting, setIsSubmitting] = useState(false)
-  
+    const { data: categories = [] } = useGetAllCategory()
     const initialValues = {
       categoryId: typeof subcategory.categoryId === "object" ? subcategory.categoryId._id : subcategory.categoryId,
       title: subcategory.title,
@@ -24,9 +19,9 @@ const mockCategories = [
       icon: subcategory.icon || "",
     }
   
-    const categoryOptions = mockCategories.map((category) => ({
+    const categoryOptions = categories.map((category) => ({
       value: category._id,
-      label: `${category.icon} ${category.name}`,
+      label: `${category.title}`,
     }))
   
     const handleSubmit = async (values) => {
@@ -130,7 +125,7 @@ const mockCategories = [
                           {values.description && <p className="text-sm text-gray-600">{values.description}</p>}
                           {values.categoryId && (
                             <p className="text-xs text-gray-500">
-                              Category: {mockCategories.find((c) => c._id === values.categoryId)?.name}
+                              Category: {categories.find((c) => c._id === values.categoryId)?.title}
                             </p>
                           )}
                         </div>

@@ -4,12 +4,13 @@ import { postSubCategoryService } from "../../../services/admin/subCategoryServi
 export const usePostSubCategory = () => {
   const queryClient = useQueryClient();
 
-  return useMutation(postSubCategoryService, {
+  return useMutation({
+    mutationFn: postSubCategoryService,
     onSuccess: () => {
-      queryClient.invalidateQueries(["admin_subcategory"]);
+      queryClient.invalidateQueries({ queryKey: ['admin_subcategory'] });
     },
     onError: (error) => {
-      console.error("Subcategory creation error:", error);
+      console.error("Subcategory post failed:", error);
     },
   });
 };

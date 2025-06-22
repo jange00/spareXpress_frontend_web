@@ -74,7 +74,7 @@ export default function TransactionDetailsModal({ transaction, onClose, onViewIn
                     <div className="flex justify-between items-center">
                       <div>
                         <p className="text-sm text-gray-500">Transaction ID</p>
-                        <p className="font-medium">{transaction.id}</p>
+                        <p className="font-medium">{transaction._id}</p>
                       </div>
                       <div>
                         <StatusBadge status={transaction.status} />
@@ -88,7 +88,7 @@ export default function TransactionDetailsModal({ transaction, onClose, onViewIn
 
                     <div>
                       <p className="text-sm text-gray-500">Date & Time</p>
-                      <p className="font-medium">{formatDate(transaction.date)}</p>
+                      <p className="font-medium">{formatDate(transaction.createdAt)}</p>
                     </div>
 
                     <div>
@@ -140,27 +140,32 @@ export default function TransactionDetailsModal({ transaction, onClose, onViewIn
                   <div className="bg-gray-50 rounded-lg p-4 space-y-4">
                     <div>
                       <p className="text-sm text-gray-500">Name</p>
-                      <p className="font-medium">{transaction.customerName}</p>
+                      <p className="font-medium">{transaction.userId?.fullname}</p>
                     </div>
 
                     <div>
                       <p className="text-sm text-gray-500">Email</p>
-                      <p className="font-medium">{transaction.customerEmail}</p>
+                      <p className="font-medium">{transaction.userId?.email}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Phone Number</p>
+                      <p className="font-medium">{transaction.userId?.phoneNumber}</p>
                     </div>
                   </div>
                 </div>
 
                 <div className="space-y-4">
                   <h3 className="font-medium text-gray-900">Shipping Address</h3>
+                  
 
                   <div className="bg-gray-50 rounded-lg p-4 space-y-2">
                     <p className="text-sm font-medium text-gray-900">Shipping Address</p>
-                    <p className="text-sm">{transaction.shippingAddress.street}</p>
+                    <p className="text-sm">{transaction.shippingAddressId?.streetAddress}</p>
                     <p className="text-sm">
-                      {transaction.shippingAddress.city}, {transaction.shippingAddress.state}{" "}
-                      {transaction.shippingAddress.zip}
+                      {transaction.shippingAddressId?.city}, {transaction.shippingAddressId?.district}{" "}
+                      {transaction.shippingAddressId?.province}
                     </p>
-                    <p className="text-sm">{transaction.shippingAddress.country}</p>
+                    <p className="text-sm">{transaction.shippingAddressId?.country}</p>
                   </div>
                 </div>
               </div>

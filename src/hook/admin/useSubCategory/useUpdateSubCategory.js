@@ -4,12 +4,13 @@ import { updateSubCategoryService } from "../../../services/admin/subCategorySer
 export const useUpdateSubCategory = () => {
   const queryClient = useQueryClient();
 
-  return useMutation(({ id, params }) => updateSubCategoryService(id, params), {
+  return useMutation({
+    mutationFn: ({ id, data }) => updateSubCategoryService(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries(["admin_subcategory"]);
+      queryClient.invalidateQueries({ queryKey: ["admin_subcategory"] });
     },
     onError: (error) => {
-      console.error("Subcategory update error:", error);
+      console.error("Failed to update subcategory:", error);
     },
   });
 };

@@ -12,10 +12,12 @@ export const useGetOrdersByUserId = (userId) => {
     setLoading(true);
     getOrderByUserIdApi(userId)
       .then((res) => {
+        console.log("API response for orders:", res);
         setData(res.data.data || []);
         setError(null);
       })
       .catch((err) => {
+        console.error("API error fetching orders:", err);
         setError(err);
         setData([]);
       })

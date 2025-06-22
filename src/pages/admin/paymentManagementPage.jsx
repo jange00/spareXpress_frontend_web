@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { sampleTransactions, paymentMethods, paymentStatuses } from "../../components/admin/PaymentManagement/mockdata/mockData"
-import TransactionTable from "../../components/admin/UIs/paymentUi/TransactionTable"
+import TransactionTable from "../../components/admin/PaymentManagement/TransactionTable"
 import SearchAndFilters from "../../components/admin/UIs/paymentUi/SearchAndFilters"
 import ActionButtons from "../../components/admin/UIs/paymentUi/ActionButtons"
 import TransactionDetailsModal from "../../components/admin/PaymentManagement/modals/TransactionDetailsModal"
@@ -9,10 +9,20 @@ import RefundModal from "../../components/admin/PaymentManagement/modals/RefundM
 import PaymentFormModal from "../../components/admin/PaymentManagement/modals/PaymentFormModal"
 import { filterTransactions } from "../../components/admin/utils/payment/filterUtils"
 
+// API mutation hook
+import { useGetAllPayment } from "../../hook/admin/usePayment/useGetAllPayment"
+import { useGetAllShippingAddress } from "../../hook/admin/useShippingAddress/useGetAllShippingAddress"
+
 export default function PaymentManagement() {
+
+  const { data: transaction = [] } = useGetAllPayment()
+  console.log(transaction)
+  const { data: shippingAddresses = [] } = useGetAllShippingAddress();
+  console.log(shippingAddresses)
+
   // State management
-  const [transactions, setTransactions] = useState(sampleTransactions)
-  const [filteredTransactions, setFilteredTransactions] = useState(sampleTransactions)
+  const [transactions, setTransactions] = useState(transaction)
+  const [filteredTransactions, setFilteredTransactions] = useState(transaction)
   const [selectedTransactions, setSelectedTransactions] = useState([])
   const [selectAll, setSelectAll] = useState(false)
 
@@ -171,8 +181,8 @@ export default function PaymentManagement() {
     const newTransaction = {
       id: newId,
       orderId: paymentData.orderId,
-      customerName: "New Customer", // This would come from user lookup
-      customerEmail: "customer@example.com", // This would come from user lookup
+      fullname: "fullname", // This would come from user lookup
+      email: "email", // This would come from user lookup
       paymentMethod: paymentData.paymentMethod,
       paymentType: "",
       amount: paymentData.amount,

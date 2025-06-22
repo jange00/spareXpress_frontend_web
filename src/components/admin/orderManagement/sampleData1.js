@@ -39,7 +39,8 @@ export const samplePayments = [
 export const initialOrders = [
   {
     _id: "65f1a2b3c4d5e6f7g8h9i0j1",
-    userId: "user1",
+    userId: "6854d734336b6b23f97df036", // Saroj Sah's ID
+    orderNumber: "ORD001",
     Amount: 150.0,
     shippingAddressId: "addr1",
     paymentId: "pay1",
@@ -52,7 +53,8 @@ export const initialOrders = [
   },
   {
     _id: "65f1a2b3c4d5e6f7g8h9i0j2",
-    userId: "user2",
+    userId: "6854d734336b6b23f97df036", // Saroj Sah's ID
+    orderNumber: "ORD002",
     Amount: 250.0,
     shippingAddressId: "addr2",
     paymentId: "pay2",
@@ -67,6 +69,7 @@ export const initialOrders = [
   {
     _id: "65f1a2b3c4d5e6f7g8h9i0j3",
     userId: "user3",
+    orderNumber: "ORD003",
     Amount: 75.0,
     shippingAddressId: "addr3",
     paymentId: "pay3",

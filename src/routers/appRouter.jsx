@@ -19,6 +19,8 @@ import ReportingDashboard from "../pages/admin/reportingAndAnalyticsPage.jsx";
 import DeliveryManagement from "../pages/admin/deliveryMangementPage.jsx";
 import SettingsPage from "../pages/admin/adminSettingPage.jsx";
 import { OrderManagement } from "../pages/admin/orderManagementPage.jsx";
+import AddCategoriesPage from "../pages/admin/addCategoryPage.jsx";
+
 
 
 
@@ -53,6 +55,7 @@ export const router = createBrowserRouter([
       { path: "/admin/payments", element: <PaymentManagement/> },
       { path: "/admin/reports", element: <ReportingDashboard/> },
       { path: "/admin/delivery", element: <DeliveryManagement/> },
+      { path: "/admin/add-category", element: <AddCategoriesPage/> },
       { path: "/admin/settings", element: <SettingsPage/> },
       
     ],

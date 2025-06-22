@@ -15,7 +15,7 @@ const navItems = [
   { id: "reports", label: "Reports & Analytics", icon: BarChart3 },
   { id: "delivery", label: "Delivery", icon: Truck },
   { id: "add-category", label: "Add Category", icon: Boxes },
-  { id: "add-Subcategory", label: "Add Sub Category", icon: ListTree },
+  { id: "add-subcategory", label: "Add Sub Category", icon: ListTree },
   { id: "add-brands", label: "Add Brand", icon: BadgeCheck },
   { id: "settings", label: "Settings", icon: Settings },
  

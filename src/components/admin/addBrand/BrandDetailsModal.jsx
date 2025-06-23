@@ -98,8 +98,8 @@ export const BrandDetailsModal = ({ brand, onClose, onEdit, onDelete }) => {
                   <label className="block text-sm font-medium text-gray-500">Category</label>
                   {typeof brand.categoryId === "object" ? (
                     <div className="mt-1 flex items-center space-x-2">
-                      {brand.categoryId.icon && <span className="text-lg">{brand.categoryId.icon}</span>}
-                      <span className="text-sm text-gray-900 font-medium">{brand.categoryId.name}</span>
+                      {/* {brand.categoryId.icon && <span className="text-lg">{brand.categoryId.icon}</span>} */}
+                      <span className="text-sm text-gray-900 font-medium">{brand.categoryId.title}</span>
                     </div>
                   ) : (
                     <p className="mt-1 text-sm text-gray-500">Category ID: {brand.categoryId}</p>
@@ -135,7 +135,7 @@ export const BrandDetailsModal = ({ brand, onClose, onEdit, onDelete }) => {
               </div>
             </div>
 
-            {/* Statistics (Mock data) */}
+            {/* Statistics */}
             <div className="bg-gray-50 rounded-lg p-4">
               <h3 className="font-medium text-gray-900 mb-3">Statistics</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -161,8 +161,8 @@ export const BrandDetailsModal = ({ brand, onClose, onEdit, onDelete }) => {
                 {typeof brand.categoryId === "object" && (
                   <>
                     <span className="flex items-center space-x-1">
-                      {brand.categoryId.icon && <span>{brand.categoryId.icon}</span>}
-                      <span>{brand.categoryId.name}</span>
+                      {/* {brand.categoryId.icon && <span>{brand.categoryId.icon}</span>} */}
+                      <span>{brand.categoryId.title}</span>
                     </span>
                     <span>→</span>
                   </>

@@ -2,14 +2,15 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateBrandService } from "../../../services/admin/brandsService/updateBrandService";
 
 export const useUpdateBrand = () => {
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
 
-  return useMutation(({ id, params }) => updateBrandService(id, params), {
+  return useMutation({
+    mutationFn: ({ id, data }) => updateBrandService(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries(["admin_brand"]);
+      queryClient.invalidateQueries({ queryKey: ["admin_brand"] })
     },
     onError: (error) => {
-      console.error("Brand update error:", error);
+      console.error("Brand update error:", error)
     },
-  });
-};
+  })
+}

@@ -21,6 +21,7 @@ import SettingsPage from "../pages/admin/adminSettingPage.jsx";
 import { OrderManagement } from "../pages/admin/orderManagementPage.jsx";
 import AddCategoriesPage from "../pages/admin/addCategoryPage.jsx";
 import { AddSubcategoryManagement } from "../pages/admin/addSubcategoryPage.jsx";
+import { AddBrandManagement } from "../pages/admin/addBrandPage.jsx";
 
 
 
@@ -58,6 +59,7 @@ export const router = createBrowserRouter([
       { path: "/admin/delivery", element: <DeliveryManagement/> },
       { path: "/admin/add-category", element: <AddCategoriesPage/> },
       { path: "/admin/add-subcategory", element: <AddSubcategoryManagement/> },
+      { path: "/admin/add-brands", element: <AddBrandManagement/> },
       { path: "/admin/settings", element: <SettingsPage/> },
       
     ],

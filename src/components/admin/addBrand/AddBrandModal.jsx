@@ -6,30 +6,14 @@ import { Select } from "../UIs/addBrandUi/Select"
 import { brandValidationSchema } from "../utils/addBrand/brandValidation"
 import { X } from "lucide-react"
 
-// Mock data - replace with your actual data
-const mockCategories = [
-  { _id: "cat_1", name: "Electronics", icon: "🔌" },
-  { _id: "cat_2", name: "Clothing", icon: "👕" },
-  { _id: "cat_3", name: "Home & Garden", icon: "🏠" },
-  { _id: "cat_4", name: "Sports & Outdoors", icon: "⚽" },
-]
-
-const mockSubcategories = [
-  { _id: "subcat_1", categoryId: "cat_1", title: "Smartphones", icon: "📱" },
-  { _id: "subcat_2", categoryId: "cat_1", title: "Laptops", icon: "💻" },
-  { _id: "subcat_3", categoryId: "cat_1", title: "Audio Equipment", icon: "🎧" },
-  { _id: "subcat_4", categoryId: "cat_2", title: "Men's Clothing", icon: "👔" },
-  { _id: "subcat_5", categoryId: "cat_2", title: "Women's Clothing", icon: "👗" },
-  { _id: "subcat_6", categoryId: "cat_2", title: "Shoes", icon: "👟" },
-  { _id: "subcat_7", categoryId: "cat_3", title: "Furniture", icon: "🪑" },
-  { _id: "subcat_8", categoryId: "cat_3", title: "Kitchen Appliances", icon: "🍳" },
-  { _id: "subcat_9", categoryId: "cat_4", title: "Fitness Equipment", icon: "🏋️" },
-  { _id: "subcat_10", categoryId: "cat_4", title: "Outdoor Gear", icon: "🏕️" },
-]
+import { useGetAllCategory } from "../../../hook/admin/useCategory/useGetAllCategory"
+import { useGetAllSubCategory } from "../../../hook/admin/useSubCategory/useGetAllSubCategory"
 
 export const AddBrandModal = ({ onSave, onClose }) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [categoryId, setCategoryId] = useState("")
+  const { data: categories = [] } = useGetAllCategory();
+  const { data: subCategories = [] } = useGetAllSubCategory();
 
   const initialValues = {
     title: "",
@@ -39,9 +23,9 @@ export const AddBrandModal = ({ onSave, onClose }) => {
     subcategoryId: "",
   }
 
-  const categoryOptions = mockCategories.map((category) => ({
+  const categoryOptions = categories.map((category) => ({
     value: category._id,
-    label: `${category.icon} ${category.name}`,
+    label: `${category.title}`,
   }))
 
   const handleSubmit = async (values) => {
@@ -69,13 +53,16 @@ export const AddBrandModal = ({ onSave, onClose }) => {
 
   const availableSubcategories = useMemo(() => {
     if (!categoryId) return []
-    return mockSubcategories
-      .filter((sub) => sub.categoryId === categoryId)
+    return subCategories
+      .filter((sub) => {
+        const subCatId = typeof sub.categoryId === "object" ? sub.categoryId._id : sub.categoryId
+        return subCatId === categoryId
+      })
       .map((sub) => ({
         value: sub._id,
-        label: `${sub.icon} ${sub.title}`,
+        label: `${sub.icon || ""} ${sub.title}`,
       }))
-  }, [categoryId])
+  }, [categoryId, subCategories])
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -135,7 +122,7 @@ export const AddBrandModal = ({ onSave, onClose }) => {
                     onChange={(e) => {
                       const newCategoryId = e.target.value
                       setFieldValue("categoryId", newCategoryId)
-                      setFieldValue("subcategoryId", "") // Reset subcategory when category changes
+                      setFieldValue("subcategoryId", "") 
                       setCategoryId(newCategoryId)
                     }}
                     error={touched.categoryId && errors.categoryId ? errors.categoryId : undefined}
@@ -166,12 +153,12 @@ export const AddBrandModal = ({ onSave, onClose }) => {
                         {values.model && <p className="text-sm text-gray-600">Model: {values.model}</p>}
                         {values.categoryId && (
                           <p className="text-xs text-gray-500">
-                            Category: {mockCategories.find((c) => c._id === values.categoryId)?.name}
+                            Category: {categories.find((c) => c._id === values.categoryId)?.title}
                           </p>
                         )}
                         {values.subcategoryId && (
                           <p className="text-xs text-gray-500">
-                            Subcategory: {mockSubcategories.find((s) => s._id === values.subcategoryId)?.title}
+                            Subcategory: {subCategories.find((s) => s._id === values.subcategoryId)?.title}
                           </p>
                         )}
                       </div>

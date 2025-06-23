@@ -8,80 +8,15 @@ import { EditBrandModal } from "../../components/admin/addBrand/EditBrandModal"
 import { BrandDetailsModal } from "../../components/admin/addBrand/BrandDetailsModal"
 import { brandFilterSchema } from "../../components/admin/utils/addBrand/brandValidation"
 import { Search, Plus, Download, Eye, Edit, Trash2, X, Grid, List, Package } from "lucide-react"
+import { ToastContainer,toast, Flip, } from "react-toastify"
+import "react-toastify/dist/ReactToastify.css"
 
-// Mock data - replace with your actual data
-const mockCategories = [
-  { _id: "cat_1", name: "Electronics", icon: "🔌" },
-  { _id: "cat_2", name: "Clothing", icon: "👕" },
-  { _id: "cat_3", name: "Home & Garden", icon: "🏠" },
-  { _id: "cat_4", name: "Sports & Outdoors", icon: "⚽" },
-]
-
-const mockSubcategories = [
-  { _id: "subcat_1", categoryId: "cat_1", title: "Smartphones", icon: "📱" },
-  { _id: "subcat_2", categoryId: "cat_1", title: "Laptops", icon: "💻" },
-  { _id: "subcat_3", categoryId: "cat_1", title: "Audio Equipment", icon: "🎧" },
-  { _id: "subcat_4", categoryId: "cat_2", title: "Men's Clothing", icon: "👔" },
-  { _id: "subcat_5", categoryId: "cat_2", title: "Women's Clothing", icon: "👗" },
-  { _id: "subcat_6", categoryId: "cat_2", title: "Shoes", icon: "👟" },
-  { _id: "subcat_7", categoryId: "cat_3", title: "Furniture", icon: "🪑" },
-  { _id: "subcat_8", categoryId: "cat_3", title: "Kitchen Appliances", icon: "🍳" },
-  { _id: "subcat_9", categoryId: "cat_4", title: "Fitness Equipment", icon: "🏋️" },
-  { _id: "subcat_10", categoryId: "cat_4", title: "Outdoor Gear", icon: "🏕️" },
-]
-
-const mockBrands = [
-  {
-    _id: "brand_1",
-    title: "Apple",
-    count: 150,
-    model: "iPhone 15 Series",
-    categoryId: mockCategories[0],
-    subcategoryId: mockSubcategories[0],
-    createdAt: "2024-01-15T10:30:00Z",
-    updatedAt: "2024-01-15T10:30:00Z",
-  },
-  {
-    _id: "brand_2",
-    title: "Samsung",
-    count: 200,
-    model: "Galaxy S24",
-    categoryId: mockCategories[0],
-    subcategoryId: mockSubcategories[0],
-    createdAt: "2024-01-16T14:20:00Z",
-    updatedAt: "2024-01-16T14:20:00Z",
-  },
-  {
-    _id: "brand_3",
-    title: "Dell",
-    count: 75,
-    model: "XPS Series",
-    categoryId: mockCategories[0],
-    subcategoryId: mockSubcategories[1],
-    createdAt: "2024-01-17T09:15:00Z",
-    updatedAt: "2024-01-17T09:15:00Z",
-  },
-  {
-    _id: "brand_4",
-    title: "Nike",
-    count: 300,
-    model: "Air Max",
-    categoryId: mockCategories[1],
-    subcategoryId: mockSubcategories[5],
-    createdAt: "2024-01-18T11:45:00Z",
-    updatedAt: "2024-01-18T11:45:00Z",
-  },
-  {
-    _id: "brand_5",
-    title: "Sony",
-    count: 120,
-    model: "WH-1000XM5",
-    categoryId: mockCategories[0],
-    subcategoryId: mockSubcategories[2],
-    createdAt: "2024-01-19T16:30:00Z",
-    updatedAt: "2024-01-19T16:30:00Z",
-  },
-]
+import { useGetAllBrand } from "../../hook/admin/useBrands/useGetAllBrand"
+import { useDeleteBrand } from "../../hook/admin/useBrands/useDeleteBrand"
+import { useUpdateBrand } from "../../hook/admin/useBrands/useUpdateBrand"
+import { useGetAllCategory } from "../../hook/admin/useCategory/useGetAllCategory"
+import { useGetAllSubCategory } from "../../hook/admin/useSubCategory/useGetAllSubCategory"
+import { usePostBrand } from "../../hook/admin/useBrands/usePostBrand"
 
 const formatDate = (dateString) => {
   if (!dateString) return "N/A"
@@ -104,7 +39,7 @@ const filterBrands = (brands, filters) => {
       (brand) =>
         brand.title.toLowerCase().includes(searchLower) ||
         brand.model?.toLowerCase().includes(searchLower) ||
-        (typeof brand.categoryId === "object" && brand.categoryId.name?.toLowerCase().includes(searchLower)) ||
+        (typeof brand.categoryId === "object" && brand.categoryId.title?.toLowerCase().includes(searchLower)) ||
         (typeof brand.subcategoryId === "object" && brand.subcategoryId.title?.toLowerCase().includes(searchLower)),
     )
   }
@@ -148,8 +83,14 @@ const filterBrands = (brands, filters) => {
 }
 
 export const AddBrandManagement = () => {
+const { data: FetchBrand = [] } = useGetAllBrand();
+const { mutate: deleteBrand } = useDeleteBrand();
+const { mutate: updateBrand} = useUpdateBrand();
+const { data: categories = [] } = useGetAllCategory();
+const { data: subCategories = [] } = useGetAllSubCategory();
+const { mutate: postBrand } = usePostBrand();
   // State management
-  const [brands, setBrands] = useState(mockBrands)
+  const [brands, setBrands] = useState(FetchBrand)
   const [selectedBrands, setSelectedBrands] = useState([])
   const [selectAll, setSelectAll] = useState(false)
   const [viewMode, setViewMode] = useState("table")
@@ -176,8 +117,8 @@ export const AddBrandManagement = () => {
 
   // Available subcategories based on selected category
   const availableSubcategories = useMemo(() => {
-    if (!filters.categoryId) return mockSubcategories
-    return mockSubcategories.filter((sub) => sub.categoryId === filters.categoryId)
+    if (!filters.categoryId) return subCategories
+    return subCategories.filter((sub) => sub.categoryId === filters.categoryId)
   }, [filters.categoryId])
 
   // Event handlers
@@ -201,31 +142,76 @@ export const AddBrandManagement = () => {
   }
 
   const handleAddBrand = (brandData) => {
-    const newBrand = {
-      _id: `brand_${Date.now()}`,
-      ...brandData,
-      categoryId: mockCategories.find((c) => c._id === brandData.categoryId),
-      subcategoryId: mockSubcategories.find((s) => s._id === brandData.subcategoryId),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    }
-    setBrands((prev) => [newBrand, ...prev])
-    setIsAddModalOpen(false)
+    // const newBrand = {
+    //   _id: `brand_${Date.now()}`,
+    //   ...brandData,
+    //   categoryId: categories.find((c) => c._id === brandData.categoryId),
+    //   subcategoryId: subCategories.find((s) => s._id === brandData.subcategoryId),
+    //   createdAt: new Date().toISOString(),
+    //   updatedAt: new Date().toISOString(),
+    // }
+    // setBrands((prev) => [newBrand, ...prev])
+    // setIsAddModalOpen(false)
+    postBrand(brandData, {
+        onSuccess: (newBrand) => {
+            setBrands((prev) => [newBrand, ...prev])
+            setIsAddModalOpen(false)
+            toast.success("Brand added successfully!")
+        },
+        onError: (error) => {
+            console.error("Failed to add brand:", error)
+            toast.error("Failed to add brand.")
+        },
+    })
   }
 
   const handleEditBrand = (updatedData) => {
-    const updatedBrand = {
-      ...updatedData,
-      categoryId: mockCategories.find((c) => c._id === updatedData.categoryId),
-      subcategoryId: mockSubcategories.find((s) => s._id === updatedData.subcategoryId),
-    }
-    setBrands((prev) => prev.map((brand) => (brand._id === updatedData._id ? updatedBrand : brand)))
-    setIsEditModalOpen(false)
+    updateBrand(
+      { id: updatedData._id, data: updatedData },
+      {
+        onSuccess: () => {
+        setBrands((prev) =>
+          prev.map((brand) =>
+            brand._id === updatedData._id
+              ? {
+                  ...brand,
+                  ...updatedData,
+                  categoryId: categories.find((c) => c._id === updatedData.categoryId),
+                  subcategoryId: subCategories.find((s) => s._id === updatedData.subcategoryId),
+                }
+              : brand
+          )
+        )
+
+          toast.success("Brand updated successfully!")
+          setIsEditModalOpen(false)
+        },
+        onError: (error) => {
+          toast.error("Failed to update brand.")
+          console.error("Update brand error:", error)
+        },
+      }
+    )
   }
 
+
   const handleDeleteBrand = (brandId) => {
-    setBrands((prev) => prev.filter((brand) => brand._id !== brandId))
-    setSelectedBrands((prev) => prev.filter((id) => id !== brandId))
+    if (!window.confirm("Are you sure you want to delete this brand?")) return
+  
+    deleteBrand(
+      { id: brandId },
+      {
+        onSuccess: () => {
+          setBrands((prev) => prev.filter((brand) => brand._id !== brandId))
+          setSelectedBrands((prev) => prev.filter((id) => id !== brandId))
+          toast.success("Brand deleted successfully!")
+        },
+        onError: (error) => {
+          console.error("Delete brand error:", error)
+          toast.error("Failed to delete brand.")
+        },
+      }
+    )
   }
 
   const handleDeleteSelected = () => {
@@ -246,7 +232,7 @@ export const AddBrandManagement = () => {
           `"${brand.title}"`,
           brand.count,
           `"${brand.model || ""}"`,
-          typeof brand.categoryId === "object" ? `"${brand.categoryId.name}"` : brand.categoryId,
+          typeof brand.categoryId === "object" ? `"${brand.categoryId.title}"` : brand.categoryId,
           typeof brand.subcategoryId === "object" ? `"${brand.subcategoryId.title}"` : brand.subcategoryId,
           formatDate(brand.createdAt),
           formatDate(brand.updatedAt),
@@ -265,9 +251,9 @@ export const AddBrandManagement = () => {
 
   const categoryOptions = [
     { value: "", label: "All Categories" },
-    ...mockCategories.map((category) => ({
+    ...categories.map((category) => ({
       value: category._id,
-      label: `${category.icon} ${category.name}`,
+      label: `${category.title}`,
     })),
   ]
 
@@ -281,6 +267,9 @@ export const AddBrandManagement = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
+        {/* Toast container */}
+      <ToastContainer position="top-right" autoClose={2000} theme='dark'
+    transition={Flip} />
       {/* Header */}
       <div className="bg-white border-b border-gray-200 shadow-sm">
         <div className="container mx-auto px-4 py-4">
@@ -336,7 +325,7 @@ export const AddBrandManagement = () => {
                     value={values.categoryId}
                     onChange={(e) => {
                       setFieldValue("categoryId", e.target.value)
-                      setFieldValue("subcategoryId", "") // Reset subcategory when category changes
+                      setFieldValue("subcategoryId", "")
                       setFilters((prev) => ({ ...prev, categoryId: e.target.value, subcategoryId: "" }))
                     }}
                   />
@@ -484,6 +473,7 @@ export const AddBrandManagement = () => {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {filteredBrands.map((brand) => (
+                    // console.log("subcategory icon:", brand.subcategoryId.icon),
                     <tr key={brand._id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <input
@@ -514,7 +504,7 @@ export const AddBrandManagement = () => {
                         {typeof brand.categoryId === "object" ? (
                           <div className="flex items-center space-x-2">
                             {brand.categoryId.icon && <span className="text-lg">{brand.categoryId.icon}</span>}
-                            <span className="text-sm text-gray-900">{brand.categoryId.name}</span>
+                            <span className="text-sm text-gray-900">{brand.categoryId.title}</span>
                           </div>
                         ) : (
                           <span className="text-sm text-gray-500">ID: {brand.categoryId}</span>
@@ -607,7 +597,7 @@ export const AddBrandManagement = () => {
                   {typeof brand.categoryId === "object" && (
                     <div className="flex items-center space-x-2">
                       {brand.categoryId.icon && <span className="text-sm">{brand.categoryId.icon}</span>}
-                      <span className="text-sm text-gray-600">{brand.categoryId.name}</span>
+                      <span className="text-sm text-gray-600">{brand.categoryId.title}</span>
                     </div>
                   )}
 

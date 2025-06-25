@@ -5,15 +5,21 @@ import CategoryTable from "../../components/admin/addCategory/CategoryTable"
 import ActionButtons from "../../components/admin/UIs/addCategoryUi/ActionButtons"
 import Modal from "../../components/admin/UIs/addCategoryUi/Modal"
 import { filterCategories, exportToCSV, exportToExcel, exportToPDF } from "../../components/admin/utils/addCategory/category-utils"
+import { ToastContainer, Flip, } from "react-toastify"
+import "react-toastify/dist/ReactToastify.css"
+import { toast } from "react-toastify"
 
 // API mutation hook
 import { usePostCategory } from "../../hook/admin/useCategory/usePostCategory"
 import { useGetAllCategory } from "../../hook/admin/useCategory/useGetAllCategory"
 import { useDeleteCategory } from "../../hook/admin/useCategory/useDeleteCategory"
+import { useUpdateCategory } from "../../hook/admin/useCategory/useUpdateCategory"
+
 
 export default function AddCategoriesPage() {
   const { data: category = [] } = useGetAllCategory()
   const { mutateAsync: deleteCategory } = useDeleteCategory();
+  const { mutate: updateCategory } =  useUpdateCategory();
   // const { mutateAsync: updateCategory } = useUpdateCategory();
 
   const [categories, setCategories] = useState(category)
@@ -49,9 +55,11 @@ export default function AddCategoriesPage() {
       const newCat = await addCategory(formData)
       setCategories((prev) => [newCat, ...prev])
       setShowAddModal(false)
-      alert("Category added successfully!")
+      // alert("Category added successfully!")
+      toast.success("Category added successfully")
     } catch (error) {
-      alert("Failed to add category. Please try again.")
+      // alert("Failed to add category. Please try again.")
+      toast.error("Failed to add category")
     }
   }
 
@@ -59,13 +67,15 @@ export default function AddCategoriesPage() {
     setEditingCategory(category)
     setShowEditModal(true)
   }
+  // console.log("Editing category:", category)
 
   const handleUpdateCategory = async (formData) => {
     if (!editingCategory) return;
     setIsSubmitting(true);
     try {
-      // Pass keys exactly as hook expects
+      console.log("formData in handleUpdateCategory:", formData);
       const updatedCat = await updateCategory({ id: editingCategory._id, updateCategory: formData });
+      // await updateCategory({ id: editingCategory._id, data: formData });
   
       setCategories((prev) =>
         prev.map((cat) => (cat._id === editingCategory._id ? updatedCat : cat))
@@ -73,10 +83,12 @@ export default function AddCategoriesPage() {
   
       setShowEditModal(false);
       setEditingCategory(null);
-      alert("Category updated successfully!");
+  
+      toast.success("Category updated successfully!");
     } catch (error) {
       console.error("Update failed", error);
-      alert("Failed to update category. Please try again.");
+  
+      toast.error("Failed to update category. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -95,10 +107,12 @@ export default function AddCategoriesPage() {
   
       setCategories((prev) => prev.filter((c) => c._id !== categoryId));
       setSelectedCategories((prev) => prev.filter((id) => id !== categoryId));
-      alert(`Category "${category.title}" deleted successfully.`);
+      toast.success("Category deleted successfully!")
+      // alert(`Category "${category.title}" deleted successfully.`);
     } catch (error) {
       console.error("Failed to delete category:", error);
-      alert("Failed to delete category. Please try again.");
+      toast.error("Failed to delete category.")
+      // alert("Failed to delete category. Please try again.");
     }
   };
 
@@ -164,8 +178,12 @@ export default function AddCategoriesPage() {
     alert("All filters cleared!")
   }
 
+
   return (
     <div className="min-h-screen bg-gray-50">
+        {/* Toast container */}
+        <ToastContainer position="top-right" autoClose={2000} theme='dark'
+    transition={Flip} />
       <div className="container mx-auto px-4 py-8 max-w-full">
       <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-6">
       <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mb-6">

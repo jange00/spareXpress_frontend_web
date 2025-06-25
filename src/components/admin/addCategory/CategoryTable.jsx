@@ -5,21 +5,29 @@ import StatusBadge from "../UIs/addCategoryUi/StatusBadge"
 
 export default function CategoryTable({ categories, onEdit, onDelete, selectedCategories, onSelectionChange }) {
   const [dropdownOpen, setDropdownOpen] = useState(null)
-  const dropdownRef = useRef(null)
 
-  // Close dropdown when clicking outside
+  // Close dropdown when clicking outside any open dropdown
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+    function handleClickOutside(event) {
+      // If no dropdown open, no need to check
+      if (!dropdownOpen) return
+
+      // Find the toggle button and dropdown container for the open dropdown by ID
+      const toggleButton = document.getElementById(`toggle-btn-${dropdownOpen}`)
+      const dropdownMenu = document.getElementById(`dropdown-menu-${dropdownOpen}`)
+
+      // If click is outside both toggle button and dropdown menu, close dropdown
+      if (
+        toggleButton && !toggleButton.contains(event.target) &&
+        dropdownMenu && !dropdownMenu.contains(event.target)
+      ) {
         setDropdownOpen(null)
       }
     }
 
     document.addEventListener("mousedown", handleClickOutside)
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside)
-    }
-  }, [])
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [dropdownOpen])
 
   const handleSelectAll = (checked) => {
     if (checked) {
@@ -43,9 +51,11 @@ export default function CategoryTable({ categories, onEdit, onDelete, selectedCa
   }
 
   const handleDelete = (category) => {
-    if (window.confirm(`Are you sure you want to delete "${category.title}"?`)) {
-      onDelete(category._id)
-    }
+    // console.log("Delete clicked for category:", category)
+    // if (window.confirm(`Are you sure you want to delete "${category.title}"?`)) {
+      
+    // }
+    onDelete(category._id)
     setDropdownOpen(null)
   }
 
@@ -129,9 +139,13 @@ export default function CategoryTable({ categories, onEdit, onDelete, selectedCa
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(category.createdAt)}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(category.updatedAt)}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <div className="relative inline-block text-left" ref={dropdownRef}>
+                    <div className="relative inline-block text-left">
                       <button
-                        onClick={() => setDropdownOpen(dropdownOpen === category._id ? null : category._id)}
+                        id={`toggle-btn-${category._id}`}
+                        onClick={() => {
+                          // console.log("More actions clicked for category:", category._id)
+                          setDropdownOpen(dropdownOpen === category._id ? null : category._id)
+                        }}
                         className="inline-flex items-center p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-full hover:bg-gray-100"
                         title="More actions"
                       >
@@ -139,7 +153,10 @@ export default function CategoryTable({ categories, onEdit, onDelete, selectedCa
                       </button>
 
                       {dropdownOpen === category._id && (
-                        <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border">
+                        <div
+                          id={`dropdown-menu-${category._id}`}
+                          className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border"
+                        >
                           <div className="py-1">
                             <button
                               onClick={() => handleEdit(category)}

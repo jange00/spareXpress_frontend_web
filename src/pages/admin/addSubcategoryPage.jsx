@@ -402,10 +402,10 @@ export const AddSubcategoryManagement = () => {
                       <td className="px-6 py-4 whitespace-nowrap">
                         {typeof subcategory.categoryId === "object" ? (
                           <div className="flex items-center space-x-2">
-                            {subcategory.categoryId.icon && (
+                            {subcategory.categoryId?.icon && (
                               <span className="text-lg">{subcategory.categoryId.icon}</span>
                             )}
-                            <span className="text-sm text-gray-900">{subcategory.categoryId.title}</span>
+                            <span className="text-sm text-gray-900">{subcategory.categoryId?.title || "Unknown Category"}</span>
                           </div>
                         ) : (
                           <span className="text-sm text-gray-500">ID: {subcategory.categoryId}</span>

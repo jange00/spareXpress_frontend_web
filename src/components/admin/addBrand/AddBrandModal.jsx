@@ -51,10 +51,24 @@ export const AddBrandModal = ({ onSave, onClose }) => {
     }
   }
 
+  // const availableSubcategories = useMemo(() => {
+  //   if (!categoryId) return []
+  //   return subCategories
+  //     .filter((sub) => {
+  //       const subCatId = typeof sub.categoryId === "object" ? sub.categoryId._id : sub.categoryId
+  //       return subCatId === categoryId
+  //     })
+  //     .map((sub) => ({
+  //       value: sub._id,
+  //       label: `${sub.icon || ""} ${sub.title}`,
+  //     }))
+  // }, [categoryId, subCategories])
+
   const availableSubcategories = useMemo(() => {
     if (!categoryId) return []
     return subCategories
       .filter((sub) => {
+        if (!sub.categoryId) return false
         const subCatId = typeof sub.categoryId === "object" ? sub.categoryId._id : sub.categoryId
         return subCatId === categoryId
       })

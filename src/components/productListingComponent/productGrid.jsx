@@ -58,7 +58,7 @@ export function ProductGrid({ products, loading, viewMode, onViewModeChange, onC
       {/* Products */}
       <div className={viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" : "space-y-6"}>
         {products.map((product) => (
-          <ProductCard key={product.id} product={product} viewMode={viewMode} />
+          <ProductCard key={product._id} product={product} viewMode={viewMode} />
         ))}
       </div>
     </>

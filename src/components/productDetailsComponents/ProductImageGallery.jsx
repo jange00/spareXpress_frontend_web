@@ -7,7 +7,7 @@ export default function ProductImageGallery({ images, productName }) {
     <div className="space-y-4">
       <div className="aspect-square rounded-lg overflow-hidden border border-gray-200">
         <img
-          src={images[selectedImage] || "/placeholder.svg?height=500&width=500"}
+          src={`http://localhost:3000/${images[selectedImage]}` || "/placeholder.svg?height=500&width=500"}
           alt={productName}
           className="w-full h-full object-cover"
         />
@@ -22,7 +22,7 @@ export default function ProductImageGallery({ images, productName }) {
             }`}
           >
             <img
-              src={image || "/placeholder.svg?height=150&width=150"}
+              src={`http://localhost:3000/${image}` || "/placeholder.svg?height=150&width=150"}
               alt={`${productName} ${index + 1}`}
               className="w-full h-full object-cover"
             />

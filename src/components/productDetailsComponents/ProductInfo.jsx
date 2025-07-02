@@ -11,6 +11,10 @@ export default function ProductInfo({ product, onBuyNow }) {
       setQuantity(newQuantity)
     }
   }
+  const originalPrice = product.price;
+const discount = product.discount || 0;
+const discountedPrice = originalPrice - (originalPrice * discount) / 100;
+
 
   return (
     <div className="space-y-6">
@@ -19,23 +23,23 @@ export default function ProductInfo({ product, onBuyNow }) {
           <span className="text-sm bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full">
             {product.inStock ? "In Stock" : "Out of Stock"}
           </span>
-          <span className="text-sm text-gray-600">SKU: {product.model}</span>
+          <span className="text-sm text-gray-600">SKU: 20</span>
         </div>
         <h1 className="text-3xl font-bold text-gray-900 mb-2">{product.name}</h1>
         <div className="flex items-center space-x-4 mb-4">
           <span className="text-gray-600">Brand:</span>
-          <Link to={`/products?brand=${product.brand}`} className="font-medium hover:text-yellow-500">
+          <Link to={`/products?brand=${product.brandId.title}`} className="font-medium hover:text-yellow-500">
             {product.brand}
           </Link>
           <span className="text-gray-300">|</span>
           <span className="text-gray-600">Model:</span>
-          <span className="font-medium">{product.model}</span>
+          <span className="font-medium">20</span>
         </div>
         <p className="text-gray-600">{product.description}</p>
       </div>
 
       {/* Rating */}
-      <div className="flex items-center space-x-4">
+      {/* <div className="flex items-center space-x-4">
         <div className="flex items-center">
           {[...Array(5)].map((_, i) => (
             <Star
@@ -47,26 +51,28 @@ export default function ProductInfo({ product, onBuyNow }) {
           ))}
         </div>
         <span className="text-gray-600">({product.reviews} reviews)</span>
-      </div>
+      </div> */}
 
       {/* Price */}
       <div className="space-y-2">
-        <div className="flex items-center space-x-4">
-          <span className="text-3xl font-bold text-gray-900">${product.price}</span>
-          {product.originalPrice && (
-            <>
-              <span className="text-xl text-gray-500 line-through">${product.originalPrice}</span>
-              <span className="bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full">
-                Save {product.discount}%
-              </span>
-            </>
-          )}
-        </div>
-        <p className="text-green-500 flex items-center">
-          <Check className="w-4 h-4 mr-1" />
-          In stock ({product.stock} units)
-        </p>
-      </div>
+  <div className="flex items-center space-x-4">
+    <span className="text-3xl font-bold text-gray-900">
+      Rs.{discount > 0 ? discountedPrice.toFixed(2) : originalPrice.toFixed(2)}
+    </span>
+    {discount > 0 && (
+      <>
+        <span className="text-xl text-gray-500 line-through">Rs.{originalPrice.toFixed(2)}</span>
+        <span className="bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full">
+          Save {discount}%
+        </span>
+      </>
+    )}
+  </div>
+  <p className="text-green-500 flex items-center">
+    <Check className="w-4 h-4 mr-1" />
+    In stock ({product.stock} units)
+  </p>
+</div>
 
       {/* Quantity Selector */}
       <div className="flex items-center space-x-4">

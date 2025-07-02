@@ -4,6 +4,7 @@ import { useProducts } from "../hook/useProducts"
 import { FilterSidebar } from "../components/productListingComponent/filterSidebar"
 import { MobileFiltersModal } from "../components/productListingComponent/mobileFiltersModal"
 import { ProductGrid } from "../components/productListingComponent/productGrid"
+import { useGetAllProduct } from "../hook/admin/useProduct/useGetAllProduct"
 
 export default function ProductsPage() {
   const [viewMode, setViewMode] = useState("grid")
@@ -17,6 +18,7 @@ export default function ProductsPage() {
     rating: "",
     availability: "",
   }
+const { data: product = [] } = useGetAllProduct();
 
   const { products, loading, selectedFilters, handleFilterChange, clearFilters } = useProducts(initialFilters)
 
@@ -53,7 +55,7 @@ export default function ProductsPage() {
           {/* Products Grid */}
           <div className="flex-1">
             <ProductGrid
-              products={products}
+              products={product}
               loading={loading}
               viewMode={viewMode}
               onViewModeChange={setViewMode}

@@ -102,7 +102,7 @@ const ProductTable = ({
                         <div className="flex-shrink-0 h-12 w-12">
                           <img
                             className="h-12 w-12 rounded-lg object-cover border border-gray-200"
-                            src={product.image?.[0] || "/placeholder.svg?height=48&width=48"}
+                            src={`http://localhost:3000/${product.image?.[0]}` || "/placeholder.svg?height=48&width=48"}
                             alt={product.name}
                             onError={(e) => {
                               e.target.src = "/placeholder.svg?height=48&width=48"

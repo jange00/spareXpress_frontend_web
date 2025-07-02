@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react"
+import { useGetAllProduct } from "./admin/useProduct/useGetAllProduct";
 
 export function useProducts(initialFilters) {
+  // const { data: product = [] } = useGetAllProduct();
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [selectedFilters, setSelectedFilters] = useState(initialFilters)

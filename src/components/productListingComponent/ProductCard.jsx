@@ -13,7 +13,7 @@ export function ProductCard({ product, viewMode }) {
       <div className={`${viewMode === "list" ? "w-48 shrink-0" : ""}`}>
         <div className="relative aspect-square overflow-hidden rounded-t-lg">
           <img
-            src={product.image || "/placeholder.svg"}
+            src={`http://localhost:3000/${product.image[0]}` || "/placeholder.svg"}
             alt={product.name}
             className="object-cover w-full h-full"
           />
@@ -54,7 +54,7 @@ export function ProductCard({ product, viewMode }) {
           </div>
           <div className="flex space-x-2">
             <Link
-              to={`/product/${product.id}`}
+              to={`/product/${product._id}`}
               className="bg-yellow-500 text-gray-900 px-3 py-1 rounded-lg text-sm font-medium hover:bg-yellow-600 transition-colors"
             >
               View Details

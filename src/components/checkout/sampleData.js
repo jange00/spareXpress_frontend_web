@@ -162,6 +162,13 @@ export const paymentMethods = [
     isDefault: true,
   },
   {
+    id: "khalti",
+    name: "Khalti",
+    type: "khalti",
+    isDefault: false,
+    // icon: "/path-to-khalti-logo.png", // optional icon path
+  },
+  {
     id: "payment-2",
     type: "wallet",
     name: "Digital Wallet",

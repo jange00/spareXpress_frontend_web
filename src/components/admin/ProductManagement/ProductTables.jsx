@@ -102,7 +102,7 @@ const ProductTable = ({
                         <div className="flex-shrink-0 h-12 w-12">
                           <img
                             className="h-12 w-12 rounded-lg object-cover border border-gray-200"
-                            src={product.image?.[0] || "/placeholder.svg?height=48&width=48"}
+                            src={`http://localhost:3000/${product.image?.[0]}` || "/placeholder.svg?height=48&width=48"}
                             alt={product.name}
                             onError={(e) => {
                               e.target.src = "/placeholder.svg?height=48&width=48"
@@ -119,12 +119,12 @@ const ProductTable = ({
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{product.categoryId.title || "N/A"}</div>
-                      {/* <div className="text-sm text-gray-500">{products.subCategoryId.title || "N/A"}</div> */}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">{product.brandId.title || "N/A"}</div>
-                    </td>
+  <div className="text-sm text-gray-900">{product.categoryId?.title || "N/A"}</div>
+  <div className="text-sm text-gray-500">{product.subCategoryId?.title || "N/A"}</div>
+</td>
+<td className="px-6 py-4 whitespace-nowrap">
+  <div className="text-sm font-medium text-gray-900">{product.brandId?.title || "N/A"}</div>
+</td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">
                         ${calculateDiscountedPrice(product.price, product.discount).toFixed(2)}

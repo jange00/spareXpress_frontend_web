@@ -1,5 +1,6 @@
 import { ShoppingCart, User } from "lucide-react"
 import CartDropdown from "../cartDropdown/CartDropdown"
+import ProfileOptions from "./profileOptions"
 // import Cart from "../cartDropdown/Cart"
 
 const UserActions = ({
@@ -10,6 +11,7 @@ const UserActions = ({
   handleQuantityChange,
   handleRemoveItem,
 }) => {
+  const token=localStorage.getItem("token") 
   const handleLoginClick = () => {
     window.location.href = "/sign-in"
   }
@@ -23,13 +25,23 @@ const UserActions = ({
       <div className="flex items-center space-x-6 ml-6">
         {/* Login Button */}
         <button
-          onClick={handleLoginClick}
-          className="hidden md:flex items-center space-x-2 cursor-pointer text-[#212121] hover:text-[#424242] transition duration-300 ease-in-out transform hover:scale-105"
-        >
-          <User className="w-6 h-6" />
-          <span className="font-semibold">Log in</span>
-        </button>
-
+            onClick={handleLoginClick}
+            className="hidden md:flex items-center space-x-2 cursor-pointer text-[#212121] hover:text-[#424242] transition duration-300 ease-in-out transform hover:scale-105"
+          >
+            <User className="w-6 h-6" />
+            <span className="font-semibold">Log in</span>
+          </button>
+        {/* {!token ? (
+          <button
+            onClick={handleLoginClick}
+            className="hidden md:flex items-center space-x-2 cursor-pointer text-[#212121] hover:text-[#424242] transition duration-300 ease-in-out transform hover:scale-105"
+          >
+            <User className="w-6 h-6" />
+            <span className="font-semibold">Log in</span>
+          </button>
+        ) : (
+          <ProfileOptions/>
+        )} */}
         {/* Cart Button */}
         <button
           onClick={handleCartClick}

@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react"
+import { useLocation } from "react-router-dom"
+import KhaltiCheckout from "khalti-checkout-web";
 import { ArrowLeft } from "lucide-react"
 // Import components
 import { OrderSummaryComponent } from "./orderSummary"
@@ -22,7 +24,15 @@ import { calculateOrderSummary } from "./calculations"
 
 const CheckoutPage = () => {
   // Main checkout state
-  const [cartItems, setCartItems] = useState(sampleProducts)
+  const location = useLocation();
+const { productData, quantity } = location.state || {};
+
+const initialCart = productData
+  ? [{ ...productData, id: productData._id || productData.id, quantity }]
+  : sampleProducts;
+
+const [cartItems, setCartItems] = useState(initialCart);
+
   const [addresses, setAddresses] = useState(sampleAddresses)
   const [selectedAddress, setSelectedAddress] = useState(addresses.find((addr) => addr.isDefault) || addresses[0])
   const [selectedShipping, setSelectedShipping] = useState(shippingMethods[0])
@@ -48,6 +58,13 @@ const CheckoutPage = () => {
     payment: true,
     coupon: true,
   })
+  useEffect(() => {
+    if (!cartItems || cartItems.length === 0) {
+      alert("Your cart is empty. Redirecting to products.");
+      window.location.href = "/products";
+    }
+  }, [cartItems]);
+  
 
   // Generate order number when order is complete
   useEffect(() => {
@@ -113,6 +130,59 @@ const CheckoutPage = () => {
     }
   }
 
+      // Khalti payment handling
+      const handleKhaltiPayment = async() => {
+        let checkout = new KhaltiCheckout({
+            // replace this key with yours
+            publicKey: 'test_public_key_617c4c6fe77c441d88451ec1408a0c0e',
+            
+            productIdentity: "1234567890",
+            productName: "Furniture Fusion",
+            productUrl: "http://localhost:3000",
+            eventHandler: {
+              onSuccess(payload) {
+                // hit merchant api for initiating verfication
+                console.log(payload);
+                let data = {
+                  "token": payload.token,
+                  "amount": payload.price
+                };
+                
+                let config = {
+                  headers: {'Authorization': 'test_secret_key_3f78fb6364ef4bd1b5fc670ce33a06f5'}
+                };
+                
+                axios.post('https://khalti.com/api/v2/payment/verify/', data, config)
+                .then(response => {
+                  console.log(response.data);
+                  
+                })
+                .catch(error => {
+                  console.log(error);
+                });
+               
+              },
+              // onError handler is optional
+              onError(error) {
+                // handle errors
+                console.log(error);
+              },
+              onClose() {
+                console.log("widget is closing");
+              },
+            },
+            paymentPreference: [
+              "KHALTI",
+              "EBANKING",
+              "MOBILE_BANKING",
+              "CONNECT_IPS",
+              "SCT",
+            ],
+          });
+        checkout.show({ amount: orderSummary.total  * 100 });
+       
+    };
+
   const handleCheckout = () => {
     if (cartItems.length === 0) {
       alert("Your cart is empty")
@@ -121,6 +191,11 @@ const CheckoutPage = () => {
 
     if (selectedPayment.type === "card" && !cvvConfirmation) {
       setCvvError("Please enter your CVV to confirm payment")
+      return
+    }
+    if (selectedPayment.type === "khalti" ) {
+      handleKhaltiPayment()
+      // setCvvError("Please enter your CVV to confirm payment")
       return
     }
 

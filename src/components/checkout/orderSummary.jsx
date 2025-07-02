@@ -53,7 +53,7 @@ export const OrderSummaryComponent = ({
                   <div className="flex items-start">
                     <div className="w-20 h-20 flex-shrink-0 bg-gray-100 rounded-md overflow-hidden">
                       <img
-                        src={item.image || "/placeholder.svg"}
+                        src={`http://localhost:3000/${item.image}` || "/placeholder.svg"}
                         alt={item.name}
                         className="w-full h-full object-cover"
                       />
@@ -66,7 +66,7 @@ export const OrderSummaryComponent = ({
                             {item.brand} • {item.model}
                           </p>
                           <div className="mt-1">
-                            <StarRating rating={item.rating} />
+                            {/* <StarRating rating={item.rating} /> */}
                           </div>
                         </div>
                         <button

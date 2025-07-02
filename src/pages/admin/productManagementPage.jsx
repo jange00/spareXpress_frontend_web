@@ -1,11 +1,4 @@
 import { useState, useEffect } from "react"
-// import {
-//   mockProducts,
-//   mockCategories,
-//   mockBrands,
-//   getCategoryName,
-//   getBrandName,
-// } from "../../components/admin/ProductManagement/mockData"
 import ProductTable from "../../components/admin/ProductManagement/ProductTables"
 import Button from "../../components/admin/UIs/productUI/Button"
 import Input from "../../components/admin/UIs/productUI/Input"
@@ -24,6 +17,8 @@ import {
   TrendingUpIcon,
   AlertTriangleIcon,
 } from "../../components/admin/icons/Icons"
+import { toast, ToastContainer,Flip } from "react-toastify"
+import "react-toastify/dist/ReactToastify.css"
 
 // API mutation hook
 import { useGetAllProduct } from "../../hook/admin/useProduct/useGetAllProduct"
@@ -39,6 +34,10 @@ const ProductManagement = () => {
   const [products, setProducts] = useState(product)
   const [filteredProducts, setFilteredProducts] = useState(product)
   const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    setProducts(product)
+  }, [product])
 
   // Filter states
   const [searchTerm, setSearchTerm] = useState("")
@@ -96,33 +95,34 @@ const ProductManagement = () => {
 
   const filterAndSortProducts = () => {
     let result = [...products]
-
+  
     // Apply search filter
     if (searchTerm) {
-      result = result.filter(
-        (product) =>
+      result = result.filter((product) => {
+        const categoryName = getCategoryName(product.categoryId).toLowerCase()
+        const brandName = getBrandName(product.brandId).toLowerCase()
+        return (
           product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          product.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          getCategoryName(product.categoryId).toLowerCase().includes(searchTerm.toLowerCase()) ||
-          getBrandName(product.brandId).toLowerCase().includes(searchTerm.toLowerCase()) ,
-          // getSubcategoryName(product.subCategoryId).toLowerCase().includes(searchTerm.toLowerCase()) ,
-      )
+          (product.description?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false) ||
+          categoryName.includes(searchTerm.toLowerCase()) ||
+          brandName.includes(searchTerm.toLowerCase())
+        )
+      })
     }
-
+  
     // Apply category filter
     if (categoryFilter) {
       result = result.filter((product) => product.categoryId === categoryFilter)
     }
-
+  
     // Apply brand filter
     if (brandFilter) {
       result = result.filter((product) => product.brandId === brandFilter)
     }
-
-    // Apply sorting
+  
+    // Sorting
     result.sort((a, b) => {
       let comparison = 0
-
       switch (sortBy) {
         case "price":
           comparison = a.price - b.price
@@ -138,12 +138,12 @@ const ProductManagement = () => {
           comparison = a.name.localeCompare(b.name)
           break
       }
-
       return sortOrder === "asc" ? comparison : -comparison
     })
-
+  
     setFilteredProducts(result)
   }
+  
 
   // Product CRUD operations
   const handleAddProduct = () => {
@@ -165,27 +165,21 @@ const ProductManagement = () => {
 
   const handleSaveProduct = async (formData) => {
     setLoading(true);
-  
     try {
       if (editingProduct) {
-        // ✅ Call backend API to update
         updateProduct(
           { id: editingProduct._id, updatedProduct: formData },
           {
             onSuccess: () => {
-              setProducts((prev) =>
-                prev.map((p) =>
-                  p._id === editingProduct._id
-                    ? { ...p, ...formData, updatedAt: new Date().toISOString() }
-                    : p
-                )
-              );
+              toast.success("Product updated successfully!");
+              // Refetch products from backend to refresh UI
+              refetchProducts();
               setIsFormModalOpen(false);
               setEditingProduct(null);
             },
             onError: (error) => {
               console.error("Update failed:", error);
-              alert("Failed to update product");
+              toast.error("Failed to update product");
             },
             onSettled: () => {
               setLoading(false);
@@ -193,7 +187,10 @@ const ProductManagement = () => {
           }
         );
       } else {
-        // Create new product
+        // For new product, you may want to call create API here instead of just updating state
+        // Assuming you have a createProduct mutation (not shown here)
+        // For demo, just add locally and toast success:
+
         const newProduct = {
           ...formData,
           _id: `prod${Date.now()}`,
@@ -201,11 +198,13 @@ const ProductManagement = () => {
           updatedAt: new Date().toISOString(),
         };
         setProducts([...products, newProduct]);
+        toast.success("Product added successfully!");
         setIsFormModalOpen(false);
+        setLoading(false);
       }
     } catch (error) {
       console.error("Error saving product:", error);
-      alert("Failed to save product");
+      toast.error("Failed to save product");
       setLoading(false);
     }
   };
@@ -312,7 +311,7 @@ const ProductManagement = () => {
     })),
   ]
 
-  const { data: subCategories = [] } = useGetAllSubCategory
+  const { data: subCategories = [] } = useGetAllSubCategory();
   const subCategoriesOptions = [
     { value: "", label: "All SubCategories"},
     ...subCategories.map((subCategories) => ({
@@ -353,6 +352,11 @@ const ProductManagement = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+
+      {/* Add ToastContainer once per app or page */}
+      <ToastContainer position="top-right" hideProgressBar={false}
+    theme='dark'
+    transition={Flip} autoClose={3000} />
       {/* Header */}
       <div className="bg-white border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">

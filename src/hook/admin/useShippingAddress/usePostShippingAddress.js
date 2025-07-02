@@ -4,12 +4,14 @@ import { postShippingAddressService } from "../../../services/admin/shippingAddr
 export const usePostShippingAddress = () => {
   const queryClient = useQueryClient();
 
-  return useMutation(postShippingAddressService, {
-    onSuccess: () => {
-      queryClient.invalidateQueries(["admin_shipping_address"]);
-    },
-    onError: (error) => {
-      console.error("Shipping address creation error:", error);
-    },
-  });
+  return useMutation({
+    mutationFn:postShippingAddressService,
+      onSuccess: () => {
+        queryClient.invalidateQueries(["admin_shipping_address"]);
+      },
+      onError: (error) => {
+        console.error("Shipping address creation error:", error);
+      },
+    }
+  );
 };

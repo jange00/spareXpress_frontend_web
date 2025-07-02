@@ -53,7 +53,7 @@ export const AddItemsModal = ({ isOpen, onClose, availableProducts, onAddToCart 
                   {product.brand} • {product.subcategory}
                 </p>
                 <div className="mb-2">
-                  <StarRating rating={product.rating} />
+                  {/* <StarRating rating={product.rating} /> */}
                 </div>
                 <div className="flex justify-between items-center">
                   <div>

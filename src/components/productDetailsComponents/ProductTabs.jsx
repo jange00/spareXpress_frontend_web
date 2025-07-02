@@ -42,7 +42,7 @@ export default function ProductTabs({ product }) {
               lacinia, nisl nisl aliquam nisl, eget aliquam nisl nisl sit amet nisl.
             </p>
             <p className="text-gray-700 leading-relaxed mt-4">
-              Designed for optimal performance and durability, this {product.subcategory.toLowerCase()} is a perfect fit
+              Designed for optimal performance and durability, this {product.subcategoryId?.title.toLowerCase()} is a perfect fit
               for your {product.category === "vehicle-parts" ? "vehicle" : "computer"}. With premium materials and
               expert craftsmanship, it ensures reliable operation and long-lasting value.
             </p>

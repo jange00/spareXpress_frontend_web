@@ -22,6 +22,7 @@ import { OrderManagement } from "../pages/admin/orderManagementPage.jsx";
 import AddCategoriesPage from "../pages/admin/addCategoryPage.jsx";
 import { AddSubcategoryManagement } from "../pages/admin/addSubcategoryPage.jsx";
 import { AddBrandManagement } from "../pages/admin/addBrandPage.jsx";
+import ProtectedRoute from "./adminGuard.jsx";
 
 
 
@@ -47,7 +48,9 @@ export const router = createBrowserRouter([
   },
 
   {
-    element: <AdminLayout />, // Admin layout for admin dashboard routes
+    element: <ProtectedRoute requiredRole="Admin">
+      <AdminLayout />
+    </ProtectedRoute>, // Admin layout for admin dashboard routes
     children: [
       { path: "/admin/dashboard", element: <AdminDashboard /> }, 
       { path: "/admin/products", element: <ProductManagement/> },

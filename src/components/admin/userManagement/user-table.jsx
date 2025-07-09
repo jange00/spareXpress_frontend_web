@@ -1,7 +1,7 @@
-import { useState } from "react"
-import Badge from "../UIs/adminUserUi/badge"
-import { formatDate } from "../utils/adminUser/helpers"
-
+import { useState, useMemo } from "react";
+import Badge from "../UIs/adminUserUi/badge";
+import { formatDate } from "../utils/adminUser/helpers";
+import { useGetAllOrder } from "../../../hook/admin/useOrder/useGetAllOrder";
 
 const UserTable = ({
   users = [],
@@ -12,28 +12,65 @@ const UserTable = ({
   onEditUser,
   onDeleteUser,
   onUpdateStatus,
-
 }) => {
-  const [dropdownOpen, setDropdownOpen] = useState(null)
+  const [dropdownOpen, setDropdownOpen] = useState(null);
+  const { data: allOrders, isLoading: ordersLoading } = useGetAllOrder();
 
+  // Debug: Log allOrders and users on each render
+  console.log("All Orders:", allOrders);
+  console.log(
+    "Users:",
+    users.map((u) => u._id)
+  );
 
+  // Compute orders count per userId (using toString for key consistency)
+  const ordersCountByUser = useMemo(() => {
+    if (!allOrders) return {};
 
+    const result = allOrders.reduce((acc, order) => {
+      const userIdStr =
+        order.userId._id?.toString?.() || order.userId?.toString?.();
+      if (!userIdStr) return acc;
+      acc[userIdStr] = (acc[userIdStr] || 0) + 1;
+      return acc;
+    }, {});
+
+    console.log("Orders Count By User:", result);
+    return result;
+  }, [allOrders]);
+
+  // Compute total spent(money) count per orderId
+  const totalAmountByUser = useMemo(() => {
+    if (!allOrders) return {};
   
+    const result = allOrders.reduce((acc, order) => {
+      const userIdStr =
+        order.userId._id?.toString?.() || order.userId?.toString?.();
+      if (!userIdStr) return acc;
+      acc[userIdStr] = (acc[userIdStr] || 0) + (order.Amount || 0);
+      return acc;
+    }, {});
+  
+    console.log("Total Amount By User:", result);
+    return result;
+  }, [allOrders]);
 
   const getStatusBadge = (status) => {
     const statusConfig = {
       active: { color: "green", label: "Active" },
       banned: { color: "red", label: "Banned" },
       pending: { color: "yellow", label: "Pending" },
-    }
-
-
-    const config = statusConfig[status] || { color: "gray", label: status }
-    return <Badge color={config.color}>{config.label}</Badge>
-  }
+    };
+    const config = statusConfig[status] || { color: "gray", label: status };
+    return <Badge color={config.color}>{config.label}</Badge>;
+  };
 
   const toggleDropdown = (userId) => {
-    setDropdownOpen(dropdownOpen === userId ? null : userId)
+    setDropdownOpen(dropdownOpen === userId ? null : userId);
+  };
+
+  if (ordersLoading) {
+    return <div>Loading orders...</div>;
   }
 
   return (
@@ -45,7 +82,9 @@ const UserTable = ({
               <th scope="col" className="px-6 py-3 text-left">
                 <input
                   type="checkbox"
-                  checked={users.length > 0 && selectedUsers.length === users.length}
+                  checked={
+                    users.length > 0 && selectedUsers.length === users.length
+                  }
                   onChange={onSelectAll}
                   className="w-4 h-4 text-[#FFB800] border-gray-300 rounded focus:ring-[#FFB800]"
                 />
@@ -53,12 +92,24 @@ const UserTable = ({
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 User ID
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Orders</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Name
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Email
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Phone
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Joined
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Status
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Orders
+              </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Total Spent
               </th>
@@ -70,7 +121,10 @@ const UserTable = ({
           <tbody className="bg-white divide-y divide-gray-200">
             {users.length === 0 ? (
               <tr>
-                <td colSpan="10" className="px-6 py-4 text-center text-gray-500">
+                <td
+                  colSpan="10"
+                  className="px-6 py-4 text-center text-gray-500"
+                >
                   No users found
                 </td>
               </tr>
@@ -86,21 +140,31 @@ const UserTable = ({
                     />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">#{user._id}</div>
+                    <div className="text-sm font-medium text-gray-900">
+                      #{user._id}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-10 w-10">
                         <img
                           className="h-10 w-10 rounded-full object-cover"
-                          src={user.profilePicture || "/placeholder.svg?height=40&width=40"}
+                          src={
+                            `http://localhost:3000/${user.profilePicture}` ||
+                            "/placeholder.svg?height=40&width=40"
+                          }
                           alt={user.fullname}
                         />
                       </div>
                       <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">{user.fullname}</div>
+                        <div className="text-sm font-medium text-gray-900">
+                          {user.fullname}
+                        </div>
                         <div className="text-sm text-gray-500">
-                          Last login: {user.lastLogin ? formatDate(user.lastLogin).split(",")[0] : "Never"}
+                          Last login:{" "}
+                          {user.lastLogin
+                            ? formatDate(user.lastLogin).split(",")[0]
+                            : "Never"}
                         </div>
                       </div>
                     </div>
@@ -109,19 +173,32 @@ const UserTable = ({
                     <div className="text-sm text-gray-900">{user.email}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{user.phoneNumber}</div>
+                    <div className="text-sm text-gray-900">
+                      {user.phoneNumber}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{formatDate(user.createdAt).split(",")[0]}</div>
-                    <div className="text-xs text-gray-500">{formatDate(user.createdAt).split(",")[1]}</div>
+                    <div className="text-sm text-gray-900">
+                      {formatDate(user.createdAt).split(",")[0]}
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      {formatDate(user.createdAt).split(",")[1]}
+                    </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">{getStatusBadge(user.status)}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{user.orders || 0}</div>
+                    {getStatusBadge(user.status)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {/* <div className="text-sm text-gray-900">₹{(users.Amount || 0).toFixed(2)}</div> */}
-                    <div className="text-sm text-gray-900">₹{(users.Amount || 0).toFixed(2)}</div>
+                    {/* <div className="text-sm text-gray-900">{ordersCountByUser[user._id.toString()] || 0}</div> */}
+                    <div className="text-sm text-gray-900">
+                      {ordersCountByUser[user._id.toString()] || 0}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">
+                      {/* Rs.{(users.Amount || 0).toFixed(2)} */}
+                      Rs.{(totalAmountByUser[user._id.toString()] || 0).toFixed(2)}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right">
                     <div className="flex items-center justify-end space-x-2">
@@ -130,7 +207,12 @@ const UserTable = ({
                         className="text-[#FFB800] hover:text-[#FFB800]/80"
                         title="View Profile"
                       >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
                           <path
                             strokeLinecap="round"
                             strokeLinejoin="round"
@@ -147,8 +229,15 @@ const UserTable = ({
                       </button>
 
                       <div className="relative">
-                        <button onClick={() => toggleDropdown(user._id)} className="text-gray-500 hover:text-gray-700">
-                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <button
+                          onClick={() => toggleDropdown(user._id)}
+                          className="text-gray-500 hover:text-gray-700"
+                        >
+                          <svg
+                            className="w-5 h-5"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
                             <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
                           </svg>
                         </button>
@@ -158,8 +247,8 @@ const UserTable = ({
                             <div className="py-1">
                               <button
                                 onClick={() => {
-                                  onViewUser(user)
-                                  setDropdownOpen(null)
+                                  onViewUser(user);
+                                  setDropdownOpen(null);
                                 }}
                                 className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                               >
@@ -186,8 +275,8 @@ const UserTable = ({
                               </button>
                               <button
                                 onClick={() => {
-                                  onEditUser(user._id)
-                                  setDropdownOpen(null)
+                                  onEditUser(user._id);
+                                  setDropdownOpen(null);
                                 }}
                                 className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                               >
@@ -208,8 +297,13 @@ const UserTable = ({
                               </button>
                               <button
                                 onClick={() => {
-                                  onUpdateStatus(user._id, user.status === "active" ? "banned" : "active")
-                                  setDropdownOpen(null)
+                                  onUpdateStatus(
+                                    user._id,
+                                    user.status === "active"
+                                      ? "banned"
+                                      : "active"
+                                  );
+                                  setDropdownOpen(null);
                                 }}
                                 className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                               >
@@ -252,8 +346,8 @@ const UserTable = ({
                               <hr className="my-1" />
                               <button
                                 onClick={() => {
-                                  onDeleteUser(user._id)
-                                  setDropdownOpen(null)
+                                  onDeleteUser(user._id);
+                                  setDropdownOpen(null);
                                 }}
                                 className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
                               >
@@ -285,7 +379,7 @@ const UserTable = ({
         </table>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default UserTable
+export default UserTable;

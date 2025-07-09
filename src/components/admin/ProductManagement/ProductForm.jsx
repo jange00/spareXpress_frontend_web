@@ -1,12 +1,6 @@
 import { useState, useEffect } from "react";
 import { Formik, Form } from "formik";
 import { productValidationSchema } from "../utils/product/validationSchema";
-// import {
-//   mockCategories,
-//   mockBrands,
-//   mockSpecifications,
-//   getSubcategoriesByCategory,
-// } from "./mockData";
 import Button from "../UIs/productUI/Button";
 import Input from "../UIs/productUI/Input";
 import Textarea from "../UIs/productUI/TextArea";

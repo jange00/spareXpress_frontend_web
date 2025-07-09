@@ -8,8 +8,11 @@ const ProductCard = ({
   onClick,
   onAddToCart,
   onWishlist,
-  onShare
+  onShare,
 }) => {
+  const originalPrice = product.price;
+  const discount = product.discount || 0;
+  const discountedPrice = originalPrice - (originalPrice * discount) / 100;
   return (
     <div
       onClick={() => onClick(product)}
@@ -17,7 +20,6 @@ const ProductCard = ({
       onMouseEnter={() => setHoveredProduct(product.id)}
       onMouseLeave={() => setHoveredProduct(null)}
     >
-      {/* Discount Badge */}
       {product.discount > 0 && (
         <div className="absolute top-4 right-4 z-10">
           <span className="bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full animate-pulse">
@@ -26,18 +28,20 @@ const ProductCard = ({
         </div>
       )}
 
-      {/* Category Badge */}
       <div className="absolute top-4 left-4 z-10">
         <span className="bg-yellow-500 text-gray-900 text-sm font-semibold px-3 py-1 rounded-full shadow-md">
           {product.badge}
         </span>
       </div>
 
-      {/* Image */}
-      <div className="relative aspect-square overflow-hidden rounded-t-xl">
+      <div className="relative w-full aspect-square overflow-hidden rounded-t-xl">
         <img
-          src={product.image || "/placeholder.svg"}
-          alt={product.name}
+          src={
+            product.image
+              ? `http://localhost:3000/${product.image}`
+              : "/placeholder.svg"
+          }
+          alt={product.name || "Product image"}
           className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
         />
         <div
@@ -45,31 +49,52 @@ const ProductCard = ({
             hoveredProduct === product.id ? "opacity-100" : "opacity-0"
           }`}
         >
-          <button onClick={(e) => onWishlist(e, product.id)} className="action-btn">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onWishlist(e, product.id);
+            }}
+            className="action-btn"
+          >
             <Heart className="w-5 h-5" />
           </button>
-          <button onClick={(e) => { e.stopPropagation(); onClick(product); }} className="action-btn">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onClick(product);
+            }}
+            className="action-btn"
+          >
             <Eye className="w-5 h-5" />
           </button>
-          <button onClick={(e) => onShare(e, product.id)} className="action-btn">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onShare(e, product.id);
+            }}
+            className="action-btn"
+          >
             <Share2 className="w-5 h-5" />
           </button>
         </div>
       </div>
 
-      {/* Product Info */}
       <div className="p-5">
         <div className="mb-3">
-          <p className="text-sm text-yellow-500 font-medium">
+          {/* <p className="text-sm text-yellow-500 font-medium">
             {product.category === "auto-parts" ? "Auto Parts" : "Computer Parts"}
+          </p> */}
+          <p className="text-sm text-yellow-500 font-medium">
+            {product.categoryId?.title || "Unknown Category"}
           </p>
           <h3 className="text-lg font-bold text-gray-900 hover:text-yellow-500 transition-colors duration-300 truncate">
             {product.name}
           </h3>
-          <p className="text-sm text-gray-600 truncate mt-1">{product.description}</p>
+          <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+            {product.description}
+          </p>
         </div>
 
-        {/* Rating */}
         <div className="flex items-center mb-3">
           <div className="flex items-center">
             {[...Array(5)].map((_, i) => (
@@ -83,33 +108,51 @@ const ProductCard = ({
               />
             ))}
           </div>
-          <span className="text-sm text-gray-600 ml-2">({product.reviews})</span>
+          <span className="text-sm text-gray-600 ml-2">
+            ({product.reviews})
+          </span>
         </div>
 
-        {/* Stock */}
         <div className="mb-3">
           <div className="flex items-center justify-between text-sm mb-1">
             <span className="text-gray-600">Available Stock:</span>
-            <span className={`font-medium ${product.stock < 10 ? "text-red-500" : "text-green-500"}`}>
+            <span
+              className={`font-medium ${
+                product.stock < 10 ? "text-red-500" : "text-green-500"
+              }`}
+            >
               {product.stock} units
             </span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-1.5">
             <div
               className="bg-yellow-500 h-1.5 rounded-full transition-all duration-500"
-              style={{ width: `${(product.stock / 30) * 100}%` }}
+              style={{
+                width: `${(Math.min(product.stock, 50) / 50) * 100}%`,
+              }}
             />
           </div>
         </div>
 
-        {/* Price and Cart */}
         <div className="flex items-center justify-between mt-4">
           <div className="flex items-center gap-2">
-            <span className="text-2xl font-bold text-gray-900">${product.price}</span>
-            <span className="text-sm text-gray-500 line-through">${product.originalPrice}</span>
+            <span className="text-2xl font-bold text-gray-900">
+              Rs.
+              {discount > 0
+                ? discountedPrice.toFixed(2)
+                : originalPrice.toFixed(2)}
+            </span>
+            {discount > 0 && (
+              <span className="text-sm text-gray-500 line-through">
+                Rs.{originalPrice.toFixed(2)}
+              </span>
+            )}
           </div>
           <button
-            onClick={(e) => onAddToCart(e, product)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onAddToCart(e, product);
+            }}
             className="flex items-center justify-center bg-gray-900 hover:bg-yellow-500 text-white hover:text-gray-900 rounded-full w-10 h-10 transition-all duration-300 transform hover:scale-110"
           >
             <ShoppingCart className="w-5 h-5" />
@@ -117,8 +160,12 @@ const ProductCard = ({
         </div>
       </div>
 
-      {/* Quick View */}
-      <div className="absolute inset-x-0 -bottom-12 group-hover:bottom-0 h-12 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500">
+      <div
+        className="absolute inset-x-0 bottom-0 h-12 flex items-center justify-center
+        opacity-0 group-hover:opacity-100
+        transform translate-y-full group-hover:translate-y-0
+        transition-all duration-500"
+      >
         <Link
           to={`/product/${product.id}`}
           state={{ productData: product }}

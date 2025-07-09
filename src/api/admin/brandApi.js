@@ -8,6 +8,7 @@ import axios from "../api";
       headers: { 'Content-Type': 'application/json' },
     });
 export const getAllBrandApi = () => axios.get("/admin/brands", )
+export const getBrandByIdApi = (id,params) => axios.get(`/admin/brands/${id}`,params )
 export const updateBrandApi = (id, params) => axios.put(`/admin/brands/${id}`, params)
 export const deleteBrandApi = (id, params) =>
     axios.delete(`/admin/brands/${id}`, { data: params });

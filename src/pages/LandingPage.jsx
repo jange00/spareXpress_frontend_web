@@ -6,8 +6,19 @@ import BlogSection from "../components/LandingPageComponents/blogSection/BlogSec
 import WhyChooseUs from "../components/LandingPageComponents/whyUs/WhyChooseUs";
 import NewArrivals from "../components/LandingPageComponents/newArrivals/NewArrivals";
 import BestSellingProducts from "../components/LandingPageComponents/bestSelling/BestSellingProducts.js";
+import ChatComponent from "../components/chatbot/chatBot";
 
 const LandingPage = () => {
+
+  let isLoggedIn = false;
+  try {
+    const token = localStorage.getItem("token");
+    const user = localStorage.getItem("user");
+    isLoggedIn = token && user && user !== "undefined";
+  } catch (error) {
+    isLoggedIn = false;
+  }
+
   return (
     <div className="bg-gray-100 font-sans">
       <HeroSection />
@@ -17,6 +28,14 @@ const LandingPage = () => {
       <NewArrivals/>
       <WhyChooseUs/>
       <BlogSection/>
+
+       {/* ✅ Show ChatComponent only if logged in */}
+       {isLoggedIn && (
+        <div className="fixed bottom-5 right-5 z-50">
+          <ChatComponent />
+        </div>
+      )}
+
     </div>
   );
 };

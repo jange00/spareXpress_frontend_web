@@ -1,6 +1,16 @@
-import { useState } from "react"
-import { ShoppingBag, ChevronUp, ChevronDown, PlusCircle, Info, Minus, Plus, Trash2, ShoppingCart } from "lucide-react"
-import { StarRating } from "./starRating"
+import { useState } from "react";
+import {
+  ShoppingBag,
+  ChevronUp,
+  ChevronDown,
+  PlusCircle,
+  Info,
+  Minus,
+  Plus,
+  Trash2,
+  ShoppingCart,
+} from "lucide-react";
+import { StarRating } from "./starRating";
 
 export const OrderSummaryComponent = ({
   cartItems,
@@ -12,11 +22,11 @@ export const OrderSummaryComponent = ({
   onAddMoreItems,
   onContinueShopping,
 }) => {
-  const [showProductDetails, setShowProductDetails] = useState(null)
+  const [showProductDetails, setShowProductDetails] = useState(null);
 
   const toggleProductDetails = (productId) => {
-    setShowProductDetails(showProductDetails === productId ? null : productId)
-  }
+    setShowProductDetails(showProductDetails === productId ? null : productId);
+  };
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden mb-6">
@@ -26,7 +36,8 @@ export const OrderSummaryComponent = ({
       >
         <h2 className="text-lg font-semibold text-gray-900 flex items-center">
           <ShoppingBag className="w-5 h-5 mr-2 text-[#FFB800]" />
-          Order Summary ({orderSummary.itemCount} {orderSummary.itemCount === 1 ? "item" : "items"})
+          Order Summary ({orderSummary.itemCount}{" "}
+          {orderSummary.itemCount === 1 ? "item" : "items"})
         </h2>
         {isExpanded ? (
           <ChevronUp className="w-5 h-5 text-gray-500" />
@@ -53,7 +64,10 @@ export const OrderSummaryComponent = ({
                   <div className="flex items-start">
                     <div className="w-20 h-20 flex-shrink-0 bg-gray-100 rounded-md overflow-hidden">
                       <img
-                        src={`http://localhost:3000/${item.image}` || "/placeholder.svg"}
+                        src={
+                          `http://localhost:3000/${item.image}` ||
+                          "/placeholder.svg"
+                        }
                         alt={item.name}
                         className="w-full h-full object-cover"
                       />
@@ -61,7 +75,9 @@ export const OrderSummaryComponent = ({
                     <div className="ml-4 flex-grow">
                       <div className="flex justify-between">
                         <div>
-                          <h3 className="font-medium text-gray-900">{item.name}</h3>
+                          <h3 className="font-medium text-gray-900">
+                            {item.name}
+                          </h3>
                           <p className="text-sm text-gray-500">
                             {item.brand} • {item.model}
                           </p>
@@ -81,15 +97,21 @@ export const OrderSummaryComponent = ({
                       <div className="flex items-center justify-between mt-3">
                         <div className="flex items-center border border-gray-300 rounded-md">
                           <button
-                            onClick={() => onQuantityChange(item.id, item.quantity - 1)}
+                            onClick={() =>
+                              onQuantityChange(item.id, item.quantity - 1)
+                            }
                             className="px-2 py-1 text-gray-600 hover:text-gray-900"
                             aria-label="Decrease quantity"
                           >
                             <Minus className="w-4 h-4" />
                           </button>
-                          <span className="px-2 py-1 text-gray-900">{item.quantity}</span>
+                          <span className="px-2 py-1 text-gray-900">
+                            {item.quantity}
+                          </span>
                           <button
-                            onClick={() => onQuantityChange(item.id, item.quantity + 1)}
+                            onClick={() =>
+                              onQuantityChange(item.id, item.quantity + 1)
+                            }
                             className="px-2 py-1 text-gray-600 hover:text-gray-900"
                             aria-label="Increase quantity"
                           >
@@ -97,10 +119,20 @@ export const OrderSummaryComponent = ({
                           </button>
                         </div>
                         <div className="text-right">
-                          <span className="font-medium text-gray-900">${(item.price * item.quantity).toFixed(2)}</span>
-                          {item.originalPrice && (
+                          <span className="font-medium text-gray-900">
+                            Rs.
+                            {item.discount > 0
+                              ? (
+                                  (item.price -
+                                    (item.price * item.discount) / 100) *
+                                  item.quantity
+                                ).toFixed(2)
+                              : (item.price * item.quantity).toFixed(2)}
+                          </span>
+
+                          {item.discount > 0 && (
                             <span className="block text-sm text-gray-500 line-through">
-                              ${(item.originalPrice * item.quantity).toFixed(2)}
+                              Rs.{(item.price * item.quantity).toFixed(2)}
                             </span>
                           )}
                         </div>
@@ -112,27 +144,38 @@ export const OrderSummaryComponent = ({
                           className="text-sm text-[#FFB800] hover:text-[#FFB800]/80 flex items-center"
                         >
                           <Info className="w-4 h-4 mr-1" />
-                          {showProductDetails === item.id ? "Hide details" : "View details"}
+                          {showProductDetails === item.id
+                            ? "Hide details"
+                            : "View details"}
                         </button>
                       </div>
 
                       {showProductDetails === item.id && (
                         <div className="mt-3 bg-gray-50 p-3 rounded-md text-sm">
-                          <p className="text-gray-700 mb-2">{item.description}</p>
+                          <p className="text-gray-700 mb-2">
+                            {item.description}
+                          </p>
 
                           <div className="mb-2">
-                            <h4 className="font-medium text-gray-900 mb-1">Specifications:</h4>
+                            <h4 className="font-medium text-gray-900 mb-1">
+                              Specifications:
+                            </h4>
                             <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-1">
-                              {Object.entries(item.specifications).map(([key, value]) => (
-                                <li key={key} className="text-gray-600">
-                                  <span className="font-medium">{key}:</span> {value}
-                                </li>
-                              ))}
+                              {Object.entries(item.specifications).map(
+                                ([key, value]) => (
+                                  <li key={key} className="text-gray-600">
+                                    <span className="font-medium">{key}:</span>{" "}
+                                    {value}
+                                  </li>
+                                )
+                              )}
                             </ul>
                           </div>
 
                           <div className="mb-2">
-                            <h4 className="font-medium text-gray-900 mb-1">Features:</h4>
+                            <h4 className="font-medium text-gray-900 mb-1">
+                              Features:
+                            </h4>
                             <ul className="list-disc list-inside">
                               {item.features.map((feature, index) => (
                                 <li key={index} className="text-gray-600">
@@ -143,21 +186,29 @@ export const OrderSummaryComponent = ({
                           </div>
 
                           <div>
-                            <h4 className="font-medium text-gray-900 mb-1">Compatible with:</h4>
-                            <p className="text-gray-600">{item.compatibility.join(", ")}</p>
+                            <h4 className="font-medium text-gray-900 mb-1">
+                              Compatible with:
+                            </h4>
+                            <p className="text-gray-600">
+                              {item.compatibility.join(", ")}
+                            </p>
                           </div>
                         </div>
                       )}
                     </div>
                   </div>
-                  {item !== cartItems[cartItems.length - 1] && <hr className="my-4 border-gray-200" />}
+                  {item !== cartItems[cartItems.length - 1] && (
+                    <hr className="my-4 border-gray-200" />
+                  )}
                 </div>
               ))}
 
               <div className="border-t border-gray-200 pt-4 mt-4">
                 <div className="flex justify-between py-2">
                   <span className="text-gray-600">Subtotal</span>
-                  <span className="text-gray-900">${orderSummary.subtotal}</span>
+                  <span className="text-gray-900">
+                    Rs.{orderSummary.subtotal}
+                  </span>
                 </div>
                 {Number.parseFloat(orderSummary.discount) > 0 && (
                   <div className="flex justify-between py-2 text-green-600">
@@ -168,24 +219,34 @@ export const OrderSummaryComponent = ({
                 <div className="flex justify-between py-2">
                   <span className="text-gray-600">Shipping</span>
                   <span className="text-gray-900">
-                    {Number.parseFloat(orderSummary.shipping) === 0 ? "Free" : `$${orderSummary.shipping}`}
+                    {Number.parseFloat(orderSummary.shipping) === 0
+                      ? "Free"
+                      : `$${orderSummary.shipping}`}
                   </span>
                 </div>
                 <div className="flex justify-between py-2">
                   <span className="text-gray-600">Tax (8%)</span>
-                  <span className="text-gray-900">${orderSummary.tax}</span>
+                  <span className="text-gray-900">Rs.{orderSummary.tax}</span>
                 </div>
                 <div className="flex justify-between py-3 border-t border-gray-200 mt-2">
-                  <span className="text-lg font-semibold text-gray-900">Total</span>
-                  <span className="text-lg font-semibold text-gray-900">${orderSummary.total}</span>
+                  <span className="text-lg font-semibold text-gray-900">
+                    Total
+                  </span>
+                  <span className="text-lg font-semibold text-gray-900">
+                    Rs.{orderSummary.total}
+                  </span>
                 </div>
               </div>
             </>
           ) : (
             <div className="py-8 text-center">
               <ShoppingCart className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-              <h3 className="text-lg font-medium text-gray-900 mb-1">Your cart is empty</h3>
-              <p className="text-gray-600 mb-4">Looks like you haven't added any items to your cart yet.</p>
+              <h3 className="text-lg font-medium text-gray-900 mb-1">
+                Your cart is empty
+              </h3>
+              <p className="text-gray-600 mb-4">
+                Looks like you haven't added any items to your cart yet.
+              </p>
               <button
                 onClick={onContinueShopping}
                 className="px-4 py-2 bg-[#FFB800] text-black font-medium rounded-md hover:bg-[#FFB800]/90"
@@ -197,5 +258,5 @@ export const OrderSummaryComponent = ({
         </div>
       )}
     </div>
-  )
-}
+  );
+};

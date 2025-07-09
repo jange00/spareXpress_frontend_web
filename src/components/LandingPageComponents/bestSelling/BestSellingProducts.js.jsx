@@ -3,8 +3,10 @@ import { useNavigate, Link } from "react-router-dom";
 import { TrendingUp } from "lucide-react";
 import { products } from "./data";
 import ProductCard from "./ProductCard";
+import { useGetAllProduct } from "../../../hook/admin/useProduct/useGetAllProduct";
 
 const BestSellingProducts = () => {
+  const { data: allProduct = [] } = useGetAllProduct();
   const [hoveredProduct, setHoveredProduct] = useState(null);
   const navigate = useNavigate();
 
@@ -37,9 +39,14 @@ const BestSellingProducts = () => {
           <div className="text-center md:text-left">
             <div className="flex items-center gap-2 mb-2">
               <span className="bg-yellow-500 h-1 w-20"></span>
-              <h2 className="text-4xl font-extrabold text-gray-900">Best-Selling Products</h2>
+              {/* <h2 className="text-4xl font-extrabold text-gray-900">Best-Selling Products</h2> */}
+              <h2 className="text-4xl font-extrabold text-gray-900">
+                All Products
+              </h2>
             </div>
-            <p className="text-gray-700 mt-2">Discover our top-rated auto and computer parts</p>
+            <p className="text-gray-700 mt-2">
+              Discover our top-rated auto and computer parts
+            </p>
           </div>
           <Link
             to="/products"
@@ -55,18 +62,20 @@ const BestSellingProducts = () => {
 
         {/* Products Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {products.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              hoveredProduct={hoveredProduct}
-              setHoveredProduct={setHoveredProduct}
-              onClick={handleProductClick}
-              onAddToCart={handleAddToCart}
-              onWishlist={handleWishlist}
-              onShare={handleShare}
-            />
-          ))}
+          {[...allProduct]
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // 👈 Sort latest first
+            .map((product) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                hoveredProduct={hoveredProduct}
+                setHoveredProduct={setHoveredProduct}
+                onClick={handleProductClick}
+                onAddToCart={handleAddToCart}
+                onWishlist={handleWishlist}
+                onShare={handleShare}
+              />
+            ))}
         </div>
       </div>
     </section>

@@ -51,7 +51,7 @@ export const ShippingMethodComponent = ({
                 </div>
                 <div className="text-right">
                   <span className="font-medium text-gray-900">
-                    {method.price === 0 ? "Free" : `$${method.price.toFixed(2)}`}
+                    {method.price === 0 ? "Free" : `Rs. ${method.price.toFixed(2)}`}
                   </span>
                 </div>
               </div>

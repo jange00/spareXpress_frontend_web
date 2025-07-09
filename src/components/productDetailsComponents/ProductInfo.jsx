@@ -23,7 +23,7 @@ const discountedPrice = originalPrice - (originalPrice * discount) / 100;
           <span className="text-sm bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full">
             {product.inStock ? "In Stock" : "Out of Stock"}
           </span>
-          <span className="text-sm text-gray-600">SKU: 20</span>
+          {/* <span className="text-sm text-gray-600">SKU: 20</span> */}
         </div>
         <h1 className="text-3xl font-bold text-gray-900 mb-2">{product.name}</h1>
         <div className="flex items-center space-x-4 mb-4">
@@ -33,7 +33,7 @@ const discountedPrice = originalPrice - (originalPrice * discount) / 100;
           </Link>
           <span className="text-gray-300">|</span>
           <span className="text-gray-600">Model:</span>
-          <span className="font-medium">20</span>
+          {/* <span className="font-medium">20</span> */}
         </div>
         <p className="text-gray-600">{product.description}</p>
       </div>

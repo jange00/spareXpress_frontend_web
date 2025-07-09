@@ -30,10 +30,13 @@ import ProtectedRoute from "./adminGuard.jsx";
 
 export const router = createBrowserRouter([
   {
-    element: <AppLayout />,
+    element:
+      <AppLayout />
+,
     errorElement: <NotFound />,
     children: [
-      { path: "/", element: <LandingPage /> },
+      // { path: "/", element: <ProtectedRoute requiredRole="Customer"><LandingPage /></ProtectedRoute> },
+      { path: "/", element:<LandingPage/>},
       { path: "/sign-in", element: <SignInPage /> },
       { path: "/sign-up", element: <SignUpPage /> },
       { path: "/products", element: <ProductsListingPage/>},
@@ -43,6 +46,7 @@ export const router = createBrowserRouter([
       { path: "/product/:productId", element: <ProductDetailsPage /> },
       { path: "/best-sellers", element: <BestSellingProducts/> },
       { path: "/deals", element: <DiscountOffers/> },
+      { path: "/checkout", element: <ProtectedRoute requiredRole="Customer"><CheckoutPage /></ProtectedRoute> },
       { path: "/checkout", element: <CheckoutPage/> },
     ],
   },
@@ -50,7 +54,7 @@ export const router = createBrowserRouter([
   {
     element: <ProtectedRoute requiredRole="Admin">
       <AdminLayout />
-    </ProtectedRoute>, // Admin layout for admin dashboard routes
+    </ProtectedRoute>, 
     children: [
       { path: "/admin/dashboard", element: <AdminDashboard /> }, 
       { path: "/admin/products", element: <ProductManagement/> },

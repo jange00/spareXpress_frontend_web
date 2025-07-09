@@ -1,7 +1,7 @@
-import React from "react"
-import { Star, ShoppingCart } from "lucide-react"
+import React from "react";
+import { Star, ShoppingCart } from "lucide-react";
 // import { IMAGE_PATHS } from "../../common/imageConstant"
-import { Link } from "react-router-dom"
+import { Link } from "react-router-dom";
 
 export function ProductCard({ product, viewMode }) {
   return (
@@ -13,7 +13,9 @@ export function ProductCard({ product, viewMode }) {
       <div className={`${viewMode === "list" ? "w-48 shrink-0" : ""}`}>
         <div className="relative aspect-square overflow-hidden rounded-t-lg">
           <img
-            src={`http://localhost:3000/${product.image[0]}` || "/placeholder.svg"}
+            src={
+              `http://localhost:3000/${product.image[0]}` || "/placeholder.svg"
+            }
             alt={product.name}
             className="object-cover w-full h-full"
           />
@@ -34,11 +36,15 @@ export function ProductCard({ product, viewMode }) {
               <Star
                 key={i}
                 className={`w-4 h-4 ${
-                  i < Math.floor(Number(product.rating)) ? "text-yellow-500 fill-yellow-500" : "text-gray-300"
+                  i < Math.floor(Number(product.rating))
+                    ? "text-yellow-500 fill-yellow-500"
+                    : "text-gray-300"
                 }`}
               />
             ))}
-            <span className="text-xs text-gray-600 ml-1">({product.reviews})</span>
+            <span className="text-xs text-gray-600 ml-1">
+              ({product.reviews})
+            </span>
           </div>
         </div>
         <h3 className="font-semibold text-lg mb-1 text-gray-900 hover:text-yellow-500 transition-colors">
@@ -47,11 +53,23 @@ export function ProductCard({ product, viewMode }) {
         <p className="text-sm text-gray-600 mb-2">{product.description}</p>
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <span className="text-lg font-bold text-gray-900">${product.price}</span>
-            {product.originalPrice && (
-              <span className="text-sm text-gray-500 line-through">${product.originalPrice}</span>
+            <span className="text-lg font-bold text-gray-900">
+              Rs.
+              {product.discount > 0
+                ? (
+                    product.price -
+                    (product.price * product.discount) / 100
+                  ).toFixed(2)
+                : product.price.toFixed(2)}
+            </span>
+
+            {product.discount > 0 && (
+              <span className="text-sm text-gray-500 line-through">
+                Rs.{product.price.toFixed(2)}
+              </span>
             )}
           </div>
+
           <div className="flex space-x-2">
             <Link
               to={`/product/${product._id}`}
@@ -62,7 +80,7 @@ export function ProductCard({ product, viewMode }) {
             <button
               className="bg-gray-900 text-white p-2 rounded-full hover:bg-yellow-500 transition-colors"
               onClick={(e) => {
-                e.preventDefault()
+                e.preventDefault();
                 // Add to cart logic here
               }}
             >
@@ -72,5 +90,5 @@ export function ProductCard({ product, viewMode }) {
         </div>
       </div>
     </div>
-  )
+  );
 }

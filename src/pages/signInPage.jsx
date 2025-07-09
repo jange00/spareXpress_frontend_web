@@ -20,11 +20,15 @@ const SignInPage = () => {
     console.log(formData)
     mutate(formData, {
       onSuccess: (res) => {
+        console.log(res)
+        console.log(res.data)
         console.log(res.data.role)
         const role=res.data.role;
 
         // login(res.user, res.token)
         localStorage.setItem("token", res.token)
+        localStorage.setItem("user",res.data)
+        localStorage.setItem("userid",res.data._id)
         localStorage.setItem("role",res.data.role)
         toast.success(data?.message || "Login Success")
         if(role==="Admin"){

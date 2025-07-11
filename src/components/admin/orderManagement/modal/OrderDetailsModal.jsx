@@ -1,22 +1,31 @@
-import { useState } from "react"
-import { Button } from "../../UIs/orderUi/Button1"
-import { PrinterIcon, TruckIcon, RefreshIcon } from "../../icons/Icons"
-// import {
-//   sampleUsers,
-//   sampleProducts,
-//   sampleShippingAddresses,
-//   samplePayments,
-//   printInvoice,
-//   generateTrackingId,
-// } from "../sampleData1"
+import { useState } from "react";
+import { Button } from "../../UIs/orderUi/Button1";
+import { PrinterIcon, TruckIcon, RefreshIcon } from "../../icons/Icons";
 
-// API mutation hook
-import { useGetAllOrder } from "../../../../hook/admin/useOrder/useGetAllOrder"
+// API hooks
+import { useGetAllOrder } from "../../../../hook/admin/useOrder/useGetAllOrder";
+import { useGetAllProduct } from "../../../../hook/admin/useProduct/useGetAllProduct";
+import { useGetAllShippingAddress } from "../../../../hook/admin/useShippingAddress/useGetAllShippingAddress";
+import { useGetAllPayment } from "../../../../hook/admin/usePayment/useGetAllPayment";
+
+// Mock functions
+const printInvoice = (order, user, items, shippingAddress, payment) => {
+  console.log("Printing invoice for:", {
+    order,
+    user,
+    items,
+    shippingAddress,
+    payment,
+  });
+  // In a real app, you would use a library like react-to-print or generate a PDF.
+  alert("Invoice data sent to console. See developer tools.");
+};
+
+const generateTrackingId = (id) => `TRACK-${id.slice(-6).toUpperCase()}`;
 
 export const OrderDetailsModal = ({ order, onClose, onUpdate, onDelete }) => {
-  // console.log(order)
-  const [isLoading, setIsLoading] = useState(false)
-  const [activeTab, setActiveTab] = useState("details")
+  const [isLoading, setIsLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState("details");
 
   const formatDate = (dateString) => {
     const options = {
@@ -25,95 +34,109 @@ export const OrderDetailsModal = ({ order, onClose, onUpdate, onDelete }) => {
       day: "2-digit",
       hour: "2-digit",
       minute: "2-digit",
+    };
+    return new Date(dateString).toLocaleDateString("en-US", options);
+  };
+
+  // ✅ Fetch all data needed for the modal
+  const { data: orderData } = useGetAllOrder();
+  const { data: products = [] } = useGetAllProduct();
+  const { data: shippingData } = useGetAllShippingAddress();
+  const { data: paymentData } = useGetAllPayment();
+
+  // Safely extract data arrays, defaulting to an empty array to prevent errors
+  const allShippingAddresses = Array.isArray(shippingData?.data) ? shippingData.data : [];
+  const allPayments = Array.isArray(paymentData?.data) ? paymentData.data : [];
+
+  // Find the full user object associated with the order
+  const user =
+    typeof order.userId === "object"
+      ? order.userId
+      : orderData?.find((o) => o._id === order._id)?.userId;
+
+  const userId = user?._id || (typeof order.userId === 'object' ? order.userId._id : order.userId);
+
+  // Find the shipping address for this order
+  const shippingAddress =
+    allShippingAddresses.find((addr) => addr._id === order.shippingAddressId) ||
+    allShippingAddresses.find((addr) => addr.userId?._id === userId); // Adjusted to check nested userId
+
+  // Find payment info
+  const payment =
+    allPayments.find((pay) => pay.orderId === order._id) ||
+    allPayments.find((pay) => pay.userId === userId);
+
+  // This function now handles both populated and unpopulated product IDs
+  const getProduct = (productIdOrObject) => {
+    if (typeof productIdOrObject === 'object' && productIdOrObject !== null) {
+      return productIdOrObject; // It's already the product object
     }
-    return new Date(dateString).toLocaleDateString("en-US", options)
-  }
+    return products.find((p) => p._id === productIdOrObject); // It's an ID, so find it
+  };
 
+  // --- Event Handlers ---
 
-
-  // Initialize product mutation
-  const { data: orders = [] } = useGetAllOrder();
-  // console.log(orders)
-
-  // Helper functions to get referenced data
-  const getUser = (userId) => sampleUsers.find((user) => user._id === userId)
-  const getProduct = (productId) => sampleProducts.find((product) => product._id === productId)
-  const getShippingAddress = (addressId) => sampleShippingAddresses.find((addr) => addr._id === addressId)
-  const getPayment = (paymentId) => samplePayments.find((payment) => payment._id === paymentId)
-
-  const user = getUser(order.userId)
-  const shippingAddress = getShippingAddress(order.shippingAddressId)
-  const payment = getPayment(order.paymentId)
-
-  // Button handlers
   const handlePrintInvoice = () => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
-      printInvoice(order, user, sampleProducts, shippingAddress, payment)
-      setTimeout(() => {
-        setIsLoading(false)
-      }, 1000)
-    } catch (error) {
-      console.error("Error printing invoice:", error)
-      alert("Failed to print invoice. Please try again.")
-      setIsLoading(false)
+      printInvoice(order, user, order.items, shippingAddress, payment);
+      setTimeout(() => setIsLoading(false), 1000);
+    } catch (e) {
+      console.error("Print failed:", e);
+      alert("Print failed");
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleTrackPackage = () => {
-    setIsLoading(true)
-    try {
-      const trackingId = generateTrackingId(order._id)
-      // Simulate opening tracking page
-      const trackingUrl = `https://example-courier.com/track/${trackingId}`
-      window.open(trackingUrl, "_blank")
-
-      setTimeout(() => {
-        setIsLoading(false)
-      }, 500)
-    } catch (error) {
-      console.error("Error tracking package:", error)
-      alert("Failed to open tracking page. Please try again.")
-      setIsLoading(false)
-    }
-  }
+    setIsLoading(true);
+    const trackingUrl = `https://example-courier.com/track/${generateTrackingId(order._id)}`;
+    window.open(trackingUrl, "_blank");
+    setTimeout(() => setIsLoading(false), 500);
+  };
 
   const handleRefreshOrder = () => {
-    setIsLoading(true)
-    // Simulate refresh delay
+    setIsLoading(true);
     setTimeout(() => {
-      setIsLoading(false)
-      alert("Order details refreshed successfully!")
-    }, 800)
-  }
+      alert("Order refreshed!");
+      setIsLoading(false);
+    }, 800);
+  };
 
   const handleUpdateOrder = () => {
-    setIsLoading(true)
+    setIsLoading(true);
     setTimeout(() => {
-      onUpdate(order._id)
-      setIsLoading(false)
-      alert("Order updated successfully!")
-    }, 600)
-  }
+      onUpdate(order._id);
+      alert("Order updated!");
+      setIsLoading(false);
+    }, 600);
+  };
 
-  const handleDeleteOrder = () => {
+  const handleDeleteOrder = async () => {
     if (window.confirm("Are you sure you want to delete this order? This action cannot be undone.")) {
-      setIsLoading(true)
-      setTimeout(() => {
-        onDelete(order._id)
-        setIsLoading(false)
-        alert("Order deleted successfully!")
-        onClose()
-      }, 500)
+      setIsLoading(true);
+      try {
+        // This calls the function passed down from OrderManagement.jsx
+        await onDelete(order._id); 
+        onClose(); // Close the modal on success
+      } catch (error) {
+        console.error("Delete operation failed:", error);
+        // The error alert will be handled by the hook in the parent
+      } finally {
+        // This ensures the loading spinner always turns off
+        setIsLoading(false);
+      }
     }
-  }
+  };
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-md flex items-center justify-center z-40 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex justify-between items-center border-b border-gray-200 px-6 py-4">
-          <h2 className="text-xl font-bold text-gray-900">Order Details: {order._id}</h2>
+        <div className="flex-shrink-0 flex justify-between items-center border-b border-gray-200 px-6 py-4">
+          <h2 className="text-xl font-bold text-gray-900">
+            Order Details: {order._id}
+          </h2>
           <div className="flex items-center space-x-2">
             <Button variant="secondary" size="sm" onClick={handleRefreshOrder} disabled={isLoading}>
               <RefreshIcon className="w-4 h-4 mr-1" />
@@ -126,18 +149,20 @@ export const OrderDetailsModal = ({ order, onClose, onUpdate, onDelete }) => {
           </div>
         </div>
 
-        {/* Order Date */}
-        <div className="px-6 py-2 border-b border-gray-200 bg-gray-50">
+        {/* Order date */}
+        <div className="flex-shrink-0 px-6 py-2 border-b border-gray-200 bg-gray-50">
           <p className="text-sm text-gray-500">
             Order created on {formatDate(order.createdAt)}
             {order.updatedAt !== order.createdAt && (
-              <span className="ml-2">• Last updated {formatDate(order.updatedAt)}</span>
+              <span className="ml-2">
+                • Last updated {formatDate(order.updatedAt)}
+              </span>
             )}
           </p>
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b border-gray-200">
+        <div className="flex-shrink-0 flex border-b border-gray-200">
           {[
             { key: "details", label: "Order Details" },
             { key: "items", label: "Order Items" },
@@ -157,83 +182,43 @@ export const OrderDetailsModal = ({ order, onClose, onUpdate, onDelete }) => {
           ))}
         </div>
 
-        {/* Tab Content */}
-        <div className="p-6 overflow-y-auto max-h-[calc(90vh-12rem)]">
+        {/* Content */}
+        <div className="flex-grow p-6 overflow-y-auto">
           {activeTab === "details" && (
             <div className="space-y-6">
-              {/* Customer Information */}
+              {/* Customer Info */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <h3 className="font-medium text-gray-900">Customer Information</h3>
-                 
-                    <div className="text-sm">
-                      <p className="font-medium">Fullname:- {order.userId.fullname}</p>
-                      <p>Email:- {order.userId.email}</p>
-                      <p>Phone Number:- {order.userId.phoneNumber}</p>
-                      {/* <p className="text-gray-500">User ID: {order.userId._id}</p> */}
-                    </div>
-                  
-                    <p className="text-sm text-gray-500">User ID: {order.userId._id}</p>
-                  
+                  <div className="text-sm">
+                    <p>Fullname: {user?.fullname || "N/A"}</p>
+                    <p>Email: {user?.email || "N/A"}</p>
+                    <p>Phone: {user?.phoneNumber || "N/A"}</p>
+                    <p className="text-gray-500">User ID: {userId || "N/A"}</p>
+                  </div>
                 </div>
-
                 <div className="space-y-2">
                   <h3 className="font-medium text-gray-900">Order Summary</h3>
-                  <div className="text-sm">
-                    <p>
-                      <span className="font-medium">Total Amount:- </span> ${order.Amount}
-                    </p>
-                    <p>
-                      <span className="font-medium">Items Count:- </span> {order.items.length}
-                    </p>
-                  </div>
+                  <p>Total Amount: Rs.{order.Amount}</p>
+                  <p>Items Count: {order.items.length}</p>
                 </div>
               </div>
 
               <hr className="border-gray-200" />
 
-              {/* Shipping and Payment Information */}
+              {/* Shipping and Payment */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <h3 className="font-medium text-gray-900">Shipping Address</h3>
                   {shippingAddress ? (
-                    <div className="text-sm">
-                      <p>{shippingAddress.address}</p>
-                      <p className="text-gray-500">Address ID: {order.shippingAddressId}</p>
+                    <div className="text-sm text-gray-800 space-y-1">
+                      <p>{shippingAddress.streetAddress}</p>
+                      <p>{shippingAddress.city}, {shippingAddress.district}</p>
+                      <p>{shippingAddress.province} - {shippingAddress.postalCode}</p>
+                      <p>{shippingAddress.country}</p>
                     </div>
                   ) : (
-                    <p className="text-sm text-gray-500">Address ID: {order.shippingAddressId.city}</p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <h3 className="font-medium text-gray-900">Payment Information</h3>
-                  {payment ? (
-                    <div className="text-sm">
-                      <p>
-                        <span className="font-medium">Method:</span> {payment.method}
-                      </p>
-                      <p>
-                        <span className="font-medium">Status:</span>{" "}
-                        <span
-                          className={
-                            payment.status === "completed"
-                              ? "text-green-600"
-                              : payment.status === "pending"
-                                ? "text-yellow-600"
-                                : "text-red-600"
-                          }
-                        >
-                          {payment.status}
-                        </span>
-                      </p>
-                      <p>
-                        <span className="font-medium">Amount:</span> ${payment.amount.toFixed(2)}
-                      </p>
-                      <p className="text-gray-500">Payment ID: {order.paymentId}</p>
-                    </div>
-                  ) : (
-                    <p className="text-sm text-gray-500">Payment ID: {order.paymentId}</p>
+                    <p className="text-sm text-gray-500">No address found for this order.</p>
                   )}
                 </div>
               </div>
@@ -245,97 +230,55 @@ export const OrderDetailsModal = ({ order, onClose, onUpdate, onDelete }) => {
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Product
-                    </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Unit Price
-                    </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Quantity
-                    </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Total
-                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Product</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Unit Price</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Quantity</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Total</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {order.items.map((item, index) => {
-                    const product = getProduct(item.productId)
-                    const unitPrice = product ? product.price : item.total / item.quantity
+                    const product = getProduct(item.productId);
+                    const unitPrice = product ? product.price : (item.total / item.quantity || 0);
                     return (
                       <tr key={index}>
+                        {/* --- START: FIXED CODE --- */}
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm font-medium text-gray-900">
-                            {product ? product.name : `Product ID: ${item.productId}`}
+                            {product?.name || item.productId}
                           </div>
-                          <div className="text-sm text-gray-500">ID: {item.productId}</div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right">
-                          ${unitPrice.toFixed(2)}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right">
-                          {item.quantity}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 text-right">
-                          ${item.total.toFixed(2)}
-                        </td>
+                        {/* --- END: FIXED CODE --- */}
+                        <td className="px-6 py-4 text-sm text-right">Rs.{unitPrice.toFixed(2)}</td>
+                        <td className="px-6 py-4 text-sm text-right">{item.quantity}</td>
+                        <td className="px-6 py-4 text-sm text-right font-medium">Rs.{item.total.toFixed(2)}</td>
                       </tr>
-                    )
+                    );
                   })}
                 </tbody>
-                <tfoot className="bg-gray-50">
-                  <tr>
-                    <td colSpan={3} className="px-6 py-3 text-right text-sm font-medium text-gray-900">
-                      Grand Total:
-                    </td>
-                    <td className="px-6 py-3 text-right text-sm font-bold text-gray-900">${order.total}</td>
-                  </tr>
-                </tfoot>
               </table>
             </div>
           )}
 
           {activeTab === "shipping" && (
-            <div className="space-y-6">
-              <div className="space-y-2">
-                <h3 className="font-medium text-gray-900">Shipping Address</h3>
-                {shippingAddress ? (
-                  <p className="text-sm">{shippingAddress.address}</p>
-                ) : (
-                  <p className="text-sm text-gray-500">Address ID: {order.shippingAddressId}</p>
-                )}
-              </div>
-
-              <hr className="border-gray-200" />
-
-              <div className="space-y-2">
-                <h3 className="font-medium text-gray-900">Tracking Information</h3>
-                <div className="text-sm">
-                  <p>
-                    <span className="font-medium">Tracking ID:</span> {generateTrackingId(order._id)}
-                  </p>
-                  <p>
-                    <span className="font-medium">Status:</span> In Transit
-                  </p>
-                  <p>
-                    <span className="font-medium">Estimated Delivery:</span>{" "}
-                    {new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString()}
-                  </p>
-                </div>
-                <div className="mt-4">
-                  <Button onClick={handleTrackPackage} disabled={isLoading}>
-                    <TruckIcon className="w-5 h-5 mr-1" />
-                    {isLoading ? "Opening..." : "Track Package"}
-                  </Button>
-                </div>
-              </div>
+            <div className="space-y-4">
+              <h3 className="font-medium text-gray-900">Tracking Info</h3>
+              <p>Tracking ID: {generateTrackingId(order._id)}</p>
+              <p>Status: In Transit</p>
+              <p>
+                Estimated Delivery:{" "}
+                {new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString()}
+              </p>
+              <Button onClick={handleTrackPackage} disabled={isLoading}>
+                <TruckIcon className="w-5 h-5 mr-1" />
+                {isLoading ? "Opening..." : "Track Package"}
+              </Button>
             </div>
           )}
         </div>
 
         {/* Footer */}
-        <div className="flex justify-between border-t border-gray-200 px-6 py-4">
+        <div className="flex-shrink-0 flex justify-between border-t border-gray-200 px-6 py-4">
           <Button variant="danger" onClick={handleDeleteOrder} disabled={isLoading}>
             {isLoading ? "Deleting..." : "Delete Order"}
           </Button>
@@ -350,5 +293,5 @@ export const OrderDetailsModal = ({ order, onClose, onUpdate, onDelete }) => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};

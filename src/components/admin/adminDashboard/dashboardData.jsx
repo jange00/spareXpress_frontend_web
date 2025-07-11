@@ -26,13 +26,13 @@ export const orderStatusData = [
   { name: "Cancelled", value: 12, color: "#e74c3c" },
 ]
 
-export const metrics = [
-  { id: "products", label: "Total Products", icon: Package, value: "1,245" },
-  { id: "orders", label: "Total Orders", icon: ShoppingCart, value: "320" },
-  { id: "customers", label: "Total Customers", icon: Users, value: "1,250" },
-  { id: "revenue", label: "Total Revenue", icon: DollarSign, value: "$42,450" },
-  { id: "lowstock", label: "Low Stock Alerts", icon: AlertTriangle, value: "8 Products" },
-]
+// export const metrics = [
+//   { id: "products", label: "Total Products", icon: Package, value: "1,245" },
+//   { id: "orders", label: "Total Orders", icon: ShoppingCart, value: "320" },
+//   { id: "customers", label: "Total Customers", icon: Users, value: "1,250" },
+//   { id: "revenue", label: "Total Revenue", icon: DollarSign, value: "$42,450" },
+//   { id: "lowstock", label: "Low Stock Alerts", icon: AlertTriangle, value: "8 Products" },
+// ]
 
 export const products = [
   {

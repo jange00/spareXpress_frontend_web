@@ -14,3 +14,5 @@ const AddEditProductModal = ({ isOpen, onClose, editingProduct, onSave, isLoadin
 }
 
 export default AddEditProductModal
+
+

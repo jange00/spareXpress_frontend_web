@@ -31,7 +31,7 @@ const AdminSidebar = () => {
   return (
     <aside className="hidden lg:flex flex-col w-64 border-r border-black/10 bg-white">
       {/* Sidebar Header */}
-      <div className="border-b border-black/10 bg-[#FFB800] p-3.5">
+      {/* <div className="border-b border-black/10 bg-[#FFB800] p-3.5">
         <Link
           to="/"
           className="text-3xl font-extrabold text-[#212121] tracking-wider cursor-pointer hover:text-[#424242] transition duration-300 ease-in-out transform hover:scale-105"
@@ -40,7 +40,13 @@ const AdminSidebar = () => {
             Spare<span className="text-red-600">X</span>press
           </h1>
         </Link>
-      </div>
+      </div> */}
+
+<div className="border-b border-black/10 bg-[#FFB800] p-3.5">
+  <h1 className="text-3xl font-extrabold text-[#212121] tracking-wider select-none">
+    Spare<span className="text-red-600">X</span>press
+  </h1>
+</div>
 
       {/* Sidebar Menu */}
       <nav className="space-y-2 mt-12 flex-1">

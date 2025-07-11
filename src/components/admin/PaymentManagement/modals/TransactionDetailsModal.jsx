@@ -1,14 +1,22 @@
-import { useState } from "react"
-import { X, Receipt, RotateCcw } from "lucide-react"
-import { formatDate, formatCurrency } from "../../utils/payment/formatters"
-import StatusBadge from "../../UIs/paymentUi/StatusBadge"
+import { useState } from "react";
+import { X, Receipt, RotateCcw } from "lucide-react";
+import { formatDate, formatCurrency } from "../../utils/payment/formatters";
+import StatusBadge from "../../UIs/paymentUi/StatusBadge";
 
-export default function TransactionDetailsModal({ transaction, onClose, onViewInvoice, onRefund }) {
-  const [activeTab, setActiveTab] = useState("details")
+export default function TransactionDetailsModal({
+  transaction,
+  onClose,
+  onViewInvoice,
+  onRefund,
+}) {
+  const [activeTab, setActiveTab] = useState("details");
 
   const calculateTotal = () => {
-    return transaction.items.reduce((total, item) => total + item.price * item.quantity, 0)
-  }
+    return transaction.items.reduce(
+      (total, item) => total + item.price * item.quantity,
+      0
+    );
+  };
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -26,7 +34,10 @@ export default function TransactionDetailsModal({ transaction, onClose, onViewIn
                   Issue Refund
                 </button>
               )}
-              <button onClick={onClose} className="text-gray-400 hover:text-gray-500">
+              <button
+                onClick={onClose}
+                className="text-gray-400 hover:text-gray-500"
+              >
                 <X className="w-6 h-6" />
               </button>
             </div>
@@ -36,7 +47,9 @@ export default function TransactionDetailsModal({ transaction, onClose, onViewIn
         <div className="flex border-b border-gray-200">
           <button
             className={`px-4 py-2 font-medium text-sm ${
-              activeTab === "details" ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-500 hover:text-gray-700"
+              activeTab === "details"
+                ? "text-blue-600 border-b-2 border-blue-600"
+                : "text-gray-500 hover:text-gray-700"
             }`}
             onClick={() => setActiveTab("details")}
           >
@@ -54,7 +67,9 @@ export default function TransactionDetailsModal({ transaction, onClose, onViewIn
           </button>
           <button
             className={`px-4 py-2 font-medium text-sm ${
-              activeTab === "items" ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-500 hover:text-gray-700"
+              activeTab === "items"
+                ? "text-blue-600 border-b-2 border-blue-600"
+                : "text-gray-500 hover:text-gray-700"
             }`}
             onClick={() => setActiveTab("items")}
           >
@@ -68,7 +83,9 @@ export default function TransactionDetailsModal({ transaction, onClose, onViewIn
             <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
-                  <h3 className="font-medium text-gray-900">Transaction Summary</h3>
+                  <h3 className="font-medium text-gray-900">
+                    Transaction Summary
+                  </h3>
 
                   <div className="bg-gray-50 rounded-lg p-4 space-y-4">
                     <div className="flex justify-between items-center">
@@ -83,29 +100,44 @@ export default function TransactionDetailsModal({ transaction, onClose, onViewIn
 
                     <div>
                       <p className="text-sm text-gray-500">Order ID</p>
-                      <p className="font-medium">{transaction.orderId}</p>
+                      {/* <p className="font-medium">{transaction.orderId}</p> */}
+                      <p className="font-medium">
+                        {transaction.orderId?._id ||
+                          transaction.orderId ||
+                          "N/A"}
+                      </p>
                     </div>
 
                     <div>
                       <p className="text-sm text-gray-500">Date & Time</p>
-                      <p className="font-medium">{formatDate(transaction.createdAt)}</p>
+                      <p className="font-medium">
+                        {formatDate(transaction.createdAt)}
+                      </p>
                     </div>
 
                     <div>
                       <p className="text-sm text-gray-500">Amount</p>
-                      <p className="text-xl font-bold">{formatCurrency(transaction.amount)}</p>
+                      <p className="text-xl font-bold">
+                        {formatCurrency(transaction.amount)}
+                      </p>
                     </div>
                   </div>
                 </div>
 
                 <div className="space-y-4">
-                  <h3 className="font-medium text-gray-900">Payment Information</h3>
+                  <h3 className="font-medium text-gray-900">
+                    Payment Information
+                  </h3>
 
                   <div className="bg-gray-50 rounded-lg p-4 space-y-4">
                     <div>
                       <p className="text-sm text-gray-500">Payment Method</p>
                       <p className="font-medium">{transaction.paymentMethod}</p>
-                      {transaction.paymentType && <p className="text-sm text-gray-500">{transaction.paymentType}</p>}
+                      {transaction.paymentType && (
+                        <p className="text-sm text-gray-500">
+                          {transaction.paymentType}
+                        </p>
+                      )}
                     </div>
 
                     <div className="pt-2">
@@ -121,8 +153,12 @@ export default function TransactionDetailsModal({ transaction, onClose, onViewIn
 
                   {transaction.notes && (
                     <div className="bg-gray-50 rounded-lg p-4">
-                      <p className="text-sm font-medium text-gray-900 mb-2">Notes</p>
-                      <p className="text-sm text-gray-700">{transaction.notes}</p>
+                      <p className="text-sm font-medium text-gray-900 mb-2">
+                        Notes
+                      </p>
+                      <p className="text-sm text-gray-700">
+                        {transaction.notes}
+                      </p>
                     </div>
                   )}
                 </div>
@@ -135,12 +171,16 @@ export default function TransactionDetailsModal({ transaction, onClose, onViewIn
             <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
-                  <h3 className="font-medium text-gray-900">Customer Details</h3>
+                  <h3 className="font-medium text-gray-900">
+                    Customer Details
+                  </h3>
 
                   <div className="bg-gray-50 rounded-lg p-4 space-y-4">
                     <div>
                       <p className="text-sm text-gray-500">Name</p>
-                      <p className="font-medium">{transaction.userId?.fullname}</p>
+                      <p className="font-medium">
+                        {transaction.userId?.fullname}
+                      </p>
                     </div>
 
                     <div>
@@ -149,23 +189,40 @@ export default function TransactionDetailsModal({ transaction, onClose, onViewIn
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Phone Number</p>
-                      <p className="font-medium">{transaction.userId?.phoneNumber}</p>
+                      <p className="font-medium">
+                        {transaction.userId?.phoneNumber}
+                      </p>
                     </div>
                   </div>
                 </div>
 
                 <div className="space-y-4">
-                  <h3 className="font-medium text-gray-900">Shipping Address</h3>
-                  
+                  <h3 className="font-medium text-gray-900">
+                    Shipping Address
+                  </h3>
 
                   <div className="bg-gray-50 rounded-lg p-4 space-y-2">
-                    <p className="text-sm font-medium text-gray-900">Shipping Address</p>
-                    <p className="text-sm">{transaction.shippingAddressId?.streetAddress}</p>
-                    <p className="text-sm">
-                      {transaction.shippingAddressId?.city}, {transaction.shippingAddressId?.district}{" "}
-                      {transaction.shippingAddressId?.province}
+                    <p className="text-sm font-medium text-gray-900">
+                      Shipping Address
                     </p>
-                    <p className="text-sm">{transaction.shippingAddressId?.country}</p>
+
+                    <p className="text-sm text-gray-500">
+                      {transaction.shippingAddressId?.streetAddress || "N/A"}
+                    </p>
+
+                    <p className="text-sm">
+                      {[
+                        transaction.shippingAddressId?.city,
+                        transaction.shippingAddressId?.district,
+                        transaction.shippingAddressId?.province,
+                      ]
+                        .filter(Boolean)
+                        .join(", ") || "N/A"}
+                    </p>
+
+                    <p className="text-sm">
+                      {transaction.shippingAddressId?.country || "N/A"}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -210,7 +267,9 @@ export default function TransactionDetailsModal({ transaction, onClose, onViewIn
                   <tbody className="bg-white divide-y divide-gray-200">
                     {transaction.items.map((item, index) => (
                       <tr key={index}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{item.name}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          {item.name}
+                        </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
                           {item.quantity}
                         </td>
@@ -225,7 +284,10 @@ export default function TransactionDetailsModal({ transaction, onClose, onViewIn
                   </tbody>
                   <tfoot className="bg-gray-50">
                     <tr>
-                      <td colSpan={3} className="px-6 py-4 text-sm font-medium text-gray-900 text-right">
+                      <td
+                        colSpan={3}
+                        className="px-6 py-4 text-sm font-medium text-gray-900 text-right"
+                      >
                         Total
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-base font-bold text-gray-900 text-right">
@@ -257,5 +319,5 @@ export default function TransactionDetailsModal({ transaction, onClose, onViewIn
         </div>
       </div>
     </div>
-  )
+  );
 }

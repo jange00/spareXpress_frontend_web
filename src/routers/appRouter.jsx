@@ -23,6 +23,9 @@ import AddCategoriesPage from "../pages/admin/addCategoryPage.jsx";
 import { AddSubcategoryManagement } from "../pages/admin/addSubcategoryPage.jsx";
 import { AddBrandManagement } from "../pages/admin/addBrandPage.jsx";
 import ProtectedRoute from "./adminGuard.jsx";
+// import ForgotPasswordPage from "../components/authComponents/forgetPassword/ResetPasswordPage.jsx";
+import RequestResetPasswordPage from "../components/authComponents/forgetPassword/RequestResetPasswordPage.jsx";
+import ResetPasswordPage from "../components/authComponents/forgetPassword/ResetPasswordPage.jsx";
 
 
 
@@ -38,6 +41,8 @@ export const router = createBrowserRouter([
       // { path: "/", element: <ProtectedRoute requiredRole="Customer"><LandingPage /></ProtectedRoute> },
       { path: "/", element:<LandingPage/>},
       { path: "/sign-in", element: <SignInPage /> },
+      { path: "/request-reset-password", element: <RequestResetPasswordPage /> },
+      { path: "/reset-password/:token", element: <ResetPasswordPage /> },
       { path: "/sign-up", element: <SignUpPage /> },
       { path: "/products", element: <ProductsListingPage/>},
       { path: "/categories/:category", element: <ProductsListingPage /> },

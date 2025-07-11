@@ -1,9 +1,17 @@
-import { useState, useEffect } from "react"
-import { OrderDetailsModal } from "../../components/admin/orderManagement/modal/OrderDetailsModal"
-import { AddOrderModal } from "../../components/admin/orderManagement/modal/AddOrderModal"
-import { Button } from "../../components/admin/UIs/orderUi/Button1"
-import { Select } from "../../components/admin/UIs/orderUi/Select"
-import { SearchIcon, PlusIcon, ExportIcon, EyeIcon, MoreHorizontalIcon, RefreshIcon, TrashIcon } from "../../components/admin/icons/Icons"
+import { useState, useEffect } from "react";
+import { OrderDetailsModal } from "../../components/admin/orderManagement/modal/OrderDetailsModal";
+import { AddOrderModal } from "../../components/admin/orderManagement/modal/AddOrderModal";
+import { Button } from "../../components/admin/UIs/orderUi/Button1";
+import { Select } from "../../components/admin/UIs/orderUi/Select";
+import {
+  SearchIcon,
+  PlusIcon,
+  ExportIcon,
+  EyeIcon,
+  MoreHorizontalIcon,
+  RefreshIcon,
+  TrashIcon,
+} from "../../components/admin/icons/Icons";
 import {
   sampleUsers,
   samplePayments,
@@ -11,124 +19,149 @@ import {
   exportToCSV,
   downloadFile,
   generateOrderId,
-} from "../../components/admin/orderManagement/sampleData1"
+} from "../../components/admin/orderManagement/sampleData1";
 
-
-import { useGetAllOrder } from "../../hook/admin/useOrder/useGetAllOrder"
+import { useGetAllOrder } from "../../hook/admin/useOrder/useGetAllOrder";
+import { useDeleteOrder } from "../../hook/admin/useOrder/useDeleteOrder";
 
 export const OrderManagement = () => {
   const { data: order = [] } = useGetAllOrder();
+  const { mutateAsync: deleteOrderMutation } = useDeleteOrder();
   // console.log(order)
   // State management
-  const [orders, setOrders] = useState(order)
-  const [filteredOrders, setFilteredOrders] = useState(order)
-  const [isLoading, setIsLoading] = useState(false)
+  const [orders, setOrders] = useState(order);
+  const [filteredOrders, setFilteredOrders] = useState(order);
+  const [isLoading, setIsLoading] = useState(false);
   const [filters, setFilters] = useState({
     searchTerm: "",
     userFilter: "",
     amountRangeFilter: { min: "", max: "" },
     dateRangeFilter: { start: "", end: "" },
-  })
-
+  });
 
   // Selection states
-  const [selectedOrders, setSelectedOrders] = useState([])
-  const [selectAll, setSelectAll] = useState(false)
+  const [selectedOrders, setSelectedOrders] = useState([]);
+  const [selectAll, setSelectAll] = useState(false);
 
   // Modal states
-  const [isOrderDetailsOpen, setIsOrderDetailsOpen] = useState(false)
-  const [currentOrder, setCurrentOrder] = useState(null)
-  const [isAddOrderOpen, setIsAddOrderOpen] = useState(false)
+  const [isOrderDetailsOpen, setIsOrderDetailsOpen] = useState(false);
+  const [currentOrder, setCurrentOrder] = useState(null);
+  const [isAddOrderOpen, setIsAddOrderOpen] = useState(false);
 
   // Helper functions to get referenced data
-  const getUser = (userId) => sampleUsers.find((user) => user._id === userId)
-  const getPayment = (paymentId) => samplePayments.find((payment) => payment._id === paymentId)
+  const getUser = (userId) => sampleUsers.find((user) => user._id === userId);
+  const getPayment = (paymentId) =>
+    samplePayments.find((payment) => payment._id === paymentId);
 
   // Filter orders effect
   useEffect(() => {
-    let result = [...orders]
+    let result = [...orders];
 
     // Apply search filter
     if (filters.searchTerm) {
       result = result.filter((order) => {
-        const user = getUser(order.userId)
+        const user = getUser(order.userId);
         return (
           order._id.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
-          (user && user.name.toLowerCase().includes(filters.searchTerm.toLowerCase())) ||
-          (user && user.email.toLowerCase().includes(filters.searchTerm.toLowerCase()))
-        )
-      })
+          (user &&
+            user.name
+              .toLowerCase()
+              .includes(filters.searchTerm.toLowerCase())) ||
+          (user &&
+            user.email.toLowerCase().includes(filters.searchTerm.toLowerCase()))
+        );
+      });
     }
 
     // Apply user filter
     if (filters.userFilter) {
-      result = result.filter((order) => order.userId === filters.userFilter)
+      result = result.filter((order) => order.userId === filters.userFilter);
     }
 
     // Apply amount range filter
     if (filters.amountRangeFilter.min || filters.amountRangeFilter.max) {
       result = result.filter((order) => {
-        const min = filters.amountRangeFilter.min ? Number.parseFloat(filters.amountRangeFilter.min) : 0
+        const min = filters.amountRangeFilter.min
+          ? Number.parseFloat(filters.amountRangeFilter.min)
+          : 0;
         const max = filters.amountRangeFilter.max
           ? Number.parseFloat(filters.amountRangeFilter.max)
-          : Number.POSITIVE_INFINITY
-        return order.Amount >= min && order.Amount <= max
-      })
+          : Number.POSITIVE_INFINITY;
+        return order.Amount >= min && order.Amount <= max;
+      });
     }
 
     // Apply date range filter
     if (filters.dateRangeFilter.start && filters.dateRangeFilter.end) {
-      const startDate = new Date(filters.dateRangeFilter.start)
-      const endDate = new Date(filters.dateRangeFilter.end)
-      endDate.setHours(23, 59, 59, 999)
+      const startDate = new Date(filters.dateRangeFilter.start);
+      const endDate = new Date(filters.dateRangeFilter.end);
+      endDate.setHours(23, 59, 59, 999);
 
       result = result.filter((order) => {
-        const orderDate = new Date(order.createdAt)
-        return orderDate >= startDate && orderDate <= endDate
-      })
+        const orderDate = new Date(order.createdAt);
+        return orderDate >= startDate && orderDate <= endDate;
+      });
     }
 
     // Sort by date (newest first)
-    result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    result.sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
 
-    setFilteredOrders(result)
-  }, [orders, filters])
+    setFilteredOrders(result);
+  }, [orders, filters]);
 
   // Event handlers
   const handleSelectAll = () => {
     if (selectAll) {
-      setSelectedOrders([])
+      setSelectedOrders([]);
     } else {
-      setSelectedOrders(filteredOrders.map((order) => order._id))
+      setSelectedOrders(filteredOrders.map((order) => order._id));
     }
-    setSelectAll(!selectAll)
-  }
+    setSelectAll(!selectAll);
+  };
 
   const handleSelectOrder = (id) => {
     if (selectedOrders.includes(id)) {
-      setSelectedOrders(selectedOrders.filter((orderId) => orderId !== id))
+      setSelectedOrders(selectedOrders.filter((orderId) => orderId !== id));
     } else {
-      setSelectedOrders([...selectedOrders, id])
+      setSelectedOrders([...selectedOrders, id]);
     }
-  }
+  };
 
   const handleViewOrder = (order) => {
-    setCurrentOrder(order)
-    setIsOrderDetailsOpen(true)
-  }
+    setCurrentOrder(order);
+    setIsOrderDetailsOpen(true);
+  };
 
   const handleUpdateOrder = (orderId) => {
     setOrders(
-      orders.map((order) => (order._id === orderId ? { ...order, updatedAt: new Date().toISOString() } : order)),
-    )
-  }
+      orders.map((order) =>
+        order._id === orderId
+          ? { ...order, updatedAt: new Date().toISOString() }
+          : order
+      )
+    );
+  };
 
-  const handleDeleteOrder = (orderId) => {
-    // setOrders(orders.filter((order) => order._id !== orderId))
-    if (selectedOrders.includes(orderId)) {
-      setSelectedOrders(selectedOrders.filter((id) => id !== orderId))
+  const handleDeleteOrder = async (orderId) => {
+    try {
+      // 1. Call the API to delete from the database
+      // ✅ FIX: Pass an object with an 'id' property to match the hook's expectation.
+      await deleteOrderMutation({ id: orderId });
+  
+      // 2. If successful, remove the order from the local state to update the UI
+      setOrders((prevOrders) => prevOrders.filter((o) => o._id !== orderId));
+      
+      // Optional: add a success message
+      alert("Order successfully deleted.");
+  
+    } catch (error) {
+      console.error("Failed to delete order:", error);
+      // The error is likely handled in your hook, but you can log it here.
     }
-  }
+  };
 
   const handleAddOrder = (newOrderData) => {
     const order = {
@@ -136,60 +169,67 @@ export const OrderManagement = () => {
       _id: generateOrderId(),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-    }
+    };
 
     // setOrders([order, ...orders])
-    setIsAddOrderOpen(false)
-  }
+    setIsAddOrderOpen(false);
+  };
 
   const handleRefreshOrders = () => {
-    setIsLoading(true)
+    setIsLoading(true);
     // Simulate refresh delay
     setTimeout(() => {
-      setIsLoading(false)
-      alert("Orders refreshed successfully!")
-    }, 800)
-  }
+      setIsLoading(false);
+      alert("Orders refreshed successfully!");
+    }, 800);
+  };
 
   const handleExportOrders = (format) => {
-    setIsLoading(true)
+    setIsLoading(true);
 
     setTimeout(() => {
       try {
-        const csvContent = exportToCSV(filteredOrders, sampleUsers, [], samplePayments)
-        const timestamp = new Date().toISOString().split("T")[0]
-        downloadFile(csvContent, `orders_export_${timestamp}.${format}`)
-        setIsLoading(false)
+        const csvContent = exportToCSV(
+          filteredOrders,
+          sampleUsers,
+          [],
+          samplePayments
+        );
+        const timestamp = new Date().toISOString().split("T")[0];
+        downloadFile(csvContent, `orders_export_${timestamp}.${format}`);
+        setIsLoading(false);
       } catch (error) {
-        console.error("Error exporting orders:", error)
-        alert("Failed to export orders. Please try again.")
-        setIsLoading(false)
+        console.error("Error exporting orders:", error);
+        alert("Failed to export orders. Please try again.");
+        setIsLoading(false);
       }
-    }, 1000)
-  }
+    }, 1000);
+  };
 
   const handleDeleteSelected = () => {
     if (selectedOrders.length === 0) {
-      alert("Please select orders to delete.")
-      return
+      alert("Please select orders to delete.");
+      return;
     }
 
     if (
       window.confirm(
-        `Are you sure you want to delete ${selectedOrders.length} selected orders? This action cannot be undone.`,
+        `Are you sure you want to delete ${selectedOrders.length} selected orders? This action cannot be undone.`
       )
     ) {
-      setIsLoading(true)
+      setIsLoading(true);
 
       setTimeout(() => {
-        setOrders(orders.filter((order) => !selectedOrders.includes(order._id)))
-        setSelectedOrders([])
-        setSelectAll(false)
-        setIsLoading(false)
-        alert(`${selectedOrders.length} orders deleted successfully!`)
-      }, 500)
+        setOrders(
+          orders.filter((order) => !selectedOrders.includes(order._id))
+        );
+        setSelectedOrders([]);
+        setSelectAll(false);
+        setIsLoading(false);
+        alert(`${selectedOrders.length} orders deleted successfully!`);
+      }, 500);
     }
-  }
+  };
 
   const handleClearFilters = () => {
     setFilters({
@@ -197,8 +237,8 @@ export const OrderManagement = () => {
       userFilter: "",
       amountRangeFilter: { min: "", max: "" },
       dateRangeFilter: { start: "", end: "" },
-    })
-  }
+    });
+  };
 
   // Utility functions
   const formatDate = (dateString) => {
@@ -208,9 +248,9 @@ export const OrderManagement = () => {
       day: "2-digit",
       hour: "2-digit",
       minute: "2-digit",
-    }
-    return new Date(dateString).toLocaleDateString("en-US", options)
-  }
+    };
+    return new Date(dateString).toLocaleDateString("en-US", options);
+  };
 
   const userOptions = [
     { value: "", label: "All Users" },
@@ -218,7 +258,7 @@ export const OrderManagement = () => {
       value: user._id,
       label: user.name,
     })),
-  ]
+  ];
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
@@ -226,11 +266,16 @@ export const OrderManagement = () => {
       <div className="bg-white border-b border-gray-200 shadow-sm">
         <div className="container mx-auto px-4 py-4">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <h1 className="text-2xl font-bold text-gray-900">Order Management</h1>
+            <h1 className="text-2xl font-bold text-gray-900">
+              Order Management
+            </h1>
 
             {/* Quick Actions */}
             <div className="flex flex-wrap gap-2">
-              <Button onClick={() => setIsAddOrderOpen(true)} disabled={isLoading}>
+              <Button
+                onClick={() => setIsAddOrderOpen(true)}
+                disabled={isLoading}
+              >
                 <PlusIcon className="w-5 h-5 mr-1" />
                 Add New Order
               </Button>
@@ -264,13 +309,21 @@ export const OrderManagement = () => {
                 </div>
               </div>
 
-              <Button variant="secondary" onClick={handleRefreshOrders} disabled={isLoading}>
+              <Button
+                variant="secondary"
+                onClick={handleRefreshOrders}
+                disabled={isLoading}
+              >
                 <RefreshIcon className="w-5 h-5 mr-1" />
                 {isLoading ? "Refreshing..." : "Refresh"}
               </Button>
 
               {selectedOrders.length > 0 && (
-                <Button variant="danger" onClick={handleDeleteSelected} disabled={isLoading}>
+                <Button
+                  variant="danger"
+                  onClick={handleDeleteSelected}
+                  disabled={isLoading}
+                >
                   <TrashIcon className="w-5 h-5 mr-1" />
                   Delete Selected ({selectedOrders.length})
                 </Button>
@@ -286,14 +339,18 @@ export const OrderManagement = () => {
                 type="text"
                 placeholder="Search by order ID or customer..."
                 value={filters.searchTerm}
-                onChange={(e) => setFilters({ ...filters, searchTerm: e.target.value })}
+                onChange={(e) =>
+                  setFilters({ ...filters, searchTerm: e.target.value })
+                }
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-[#FFB800] focus:border-[#FFB800] outline-none"
               />
             </div>
 
             <Select
               value={filters.userFilter}
-              onChange={(e) => setFilters({ ...filters, userFilter: e.target.value })}
+              onChange={(e) =>
+                setFilters({ ...filters, userFilter: e.target.value })
+              }
               options={userOptions}
             />
 
@@ -304,7 +361,10 @@ export const OrderManagement = () => {
               onChange={(e) =>
                 setFilters({
                   ...filters,
-                  amountRangeFilter: { ...filters.amountRangeFilter, min: e.target.value },
+                  amountRangeFilter: {
+                    ...filters.amountRangeFilter,
+                    min: e.target.value,
+                  },
                 })
               }
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-[#FFB800] focus:border-[#FFB800] outline-none"
@@ -317,7 +377,10 @@ export const OrderManagement = () => {
               onChange={(e) =>
                 setFilters({
                   ...filters,
-                  amountRangeFilter: { ...filters.amountRangeFilter, max: e.target.value },
+                  amountRangeFilter: {
+                    ...filters.amountRangeFilter,
+                    max: e.target.value,
+                  },
                 })
               }
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-[#FFB800] focus:border-[#FFB800] outline-none"
@@ -329,7 +392,10 @@ export const OrderManagement = () => {
               onChange={(e) =>
                 setFilters({
                   ...filters,
-                  dateRangeFilter: { ...filters.dateRangeFilter, start: e.target.value },
+                  dateRangeFilter: {
+                    ...filters.dateRangeFilter,
+                    start: e.target.value,
+                  },
                 })
               }
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-[#FFB800] focus:border-[#FFB800] outline-none"
@@ -373,6 +439,9 @@ export const OrderManagement = () => {
                     Customer
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Phone Number
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Date
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -381,9 +450,7 @@ export const OrderManagement = () => {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Items
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Payment Status
-                  </th>
+                  
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Actions
                   </th>
@@ -392,15 +459,18 @@ export const OrderManagement = () => {
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredOrders.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="px-6 py-4 text-center text-gray-500">
+                    <td
+                      colSpan={8}
+                      className="px-6 py-4 text-center text-gray-500"
+                    >
                       No orders found
                     </td>
                   </tr>
                 ) : (
                   filteredOrders.map((order) => {
                     // console.log("Order ID:", order._id, "Items:", order.items)
-                    const user = order.customer
-                    const payment = getPayment(order.paymentId)
+                    const user = order.customer;
+                    const payment = getPayment(order.paymentId);
                     return (
                       <tr key={order._id} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -412,43 +482,39 @@ export const OrderManagement = () => {
                           />
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-gray-900">{order._id}</div>
+                          <div className="text-sm font-medium text-gray-900">
+                            {order._id}
+                          </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-
-                            <div>
-                              <div className="text-sm font-medium text-gray-900">{order.userId.fullname}</div>
-                              <div className="text-sm text-gray-500">{order.userId.email}</div>
+                          <div>
+                            <div className="text-sm font-medium text-gray-900">
+                              {order.userId.fullname}
                             </div>
-                          
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">{formatDate(order.createdAt
-)}</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-gray-900">${order.Amount}</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">{order.items.length} items</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          
-                            <div>
-
-                              <div
-                                className={`text-sm ${
-                                  order.paymentMethodId === "completed"
-                                    ? "text-green-600"
-                                    : order.paymentMethodId === "pending"
-                                      ? "text-yellow-600"
-                                      : "text-red-600"
-                                }`}
-                              >
-                                {order.paymentMethodId.paymentStatus}
-                              </div>
+                            <div className="text-sm text-gray-500">
+                              {order.userId.email}
                             </div>
-                        
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-900">
+                            {order.userId?.phoneNumber || "N/A"}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-900">
+                            {formatDate(order.createdAt)}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-medium text-gray-900">
+                            Rs.{order.Amount}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-900">
+                            {order.items.length} items
+                          </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <div className="flex items-center justify-end space-x-2">
@@ -459,17 +525,10 @@ export const OrderManagement = () => {
                             >
                               <EyeIcon className="w-5 h-5" />
                             </button>
-                            <button
-                              className="text-gray-500 hover:text-gray-700"
-                              title="More Actions"
-                              onClick={() => alert("More actions: Edit, Duplicate, Archive")}
-                            >
-                              <MoreHorizontalIcon className="w-5 h-5" />
-                            </button>
                           </div>
                         </td>
                       </tr>
-                    )
+                    );
                   })
                 )}
               </tbody>
@@ -488,7 +547,12 @@ export const OrderManagement = () => {
         />
       )}
 
-      {isAddOrderOpen && <AddOrderModal onSave={handleAddOrder} onClose={() => setIsAddOrderOpen(false)} />}
+      {isAddOrderOpen && (
+        <AddOrderModal
+          onSave={handleAddOrder}
+          onClose={() => setIsAddOrderOpen(false)}
+        />
+      )}
     </div>
-  )
-}
+  );
+};

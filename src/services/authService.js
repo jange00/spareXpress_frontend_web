@@ -1,4 +1,4 @@
-import { registerUserApi, loginUserApi } from "../api/authApi";
+import { registerUserApi, loginUserApi, resetPasswordApi, requestResetPasswordApi } from "../api/authApi";
 
 export const registerUserService = async (formData) => {
     try{
@@ -19,3 +19,23 @@ export const loginUserService = async (formData) => {
       throw new Error(errorMessage)
     }
 }  
+
+
+export const requestResetPasswordService = async (formData) => {
+  try {
+    const response = await requestResetPasswordApi(formData)
+    return response.data
+  }catch(err){
+    throw err.response?.data || {message: "Request password failed"}
+  }
+}
+
+export const resetPasswordService = async (formData) => {
+  try {
+    console.log("Reset password data:", data, "Token", token)
+    const response = await resetPasswordApi(data, token)
+    return response.data
+  }catch(err){
+    throw err.response?.data || {message: "Reset password failed"}
+  }
+}

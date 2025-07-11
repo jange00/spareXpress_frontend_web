@@ -199,9 +199,9 @@ const UserTable = ({
                         {formatDate(user.createdAt).split(",")[1]}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    {/* <td className="px-6 py-4 whitespace-nowrap">
                       {getStatusBadge(user.status)}
-                    </td>
+                    </td> */}
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {ordersCountByUser[userLookupKey] || 0}
                     </td>

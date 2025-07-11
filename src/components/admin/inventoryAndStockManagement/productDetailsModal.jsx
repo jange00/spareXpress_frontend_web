@@ -92,18 +92,6 @@ const ProductDetailsModal = ({
           >
             Product Details
           </button>
-          <button
-            className={`px-4 py-2 font-medium text-sm ${activeTab === "stock" ? "text-[#FFB800] border-b-2 border-[#FFB800]" : "text-gray-500 hover:text-gray-700"}`}
-            onClick={() => setActiveTab("stock")}
-          >
-            Stock Information
-          </button>
-          <button
-            className={`px-4 py-2 font-medium text-sm ${activeTab === "history" ? "text-[#FFB800] border-b-2 border-[#FFB800]" : "text-gray-500 hover:text-gray-700"}`}
-            onClick={() => setActiveTab("history")}
-          >
-            Stock History
-          </button>
         </div>
 
         <div className="p-6 overflow-y-auto max-h-[calc(90vh-12rem)]">
@@ -115,7 +103,8 @@ const ProductDetailsModal = ({
                 <div className="flex flex-col items-center space-y-2">
                   <div className="w-32 h-32 rounded-md overflow-hidden bg-gray-100">
                     <img
-                      src={isEditMode ? editedProduct.image : product.image}
+                      // src={isEditMode ? editedProduct.image : product.image}
+                      src={isEditMode ? editedProduct.image : `https://localhost:3000${product.image}`}
                       alt={isEditMode ? editedProduct.name : product.name}
                       className="w-full h-full object-cover"
                     />
@@ -142,21 +131,6 @@ const ProductDetailsModal = ({
                     </div>
 
                     <div className="space-y-2">
-                      <label className="block text-sm font-medium text-gray-700">SKU</label>
-                      {isEditMode ? (
-                        <input
-                          type="text"
-                          name="sku"
-                          value={editedProduct.sku}
-                          onChange={handleChange}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-[#FFB800] focus:border-[#FFB800]"
-                        />
-                      ) : (
-                        <p className="text-sm text-gray-900">{product.sku}</p>
-                      )}
-                    </div>
-
-                    <div className="space-y-2">
                       <label className="block text-sm font-medium text-gray-700">Category</label>
                       {isEditMode ? (
                         <select
@@ -173,7 +147,7 @@ const ProductDetailsModal = ({
                           ))}
                         </select>
                       ) : (
-                        <p className="text-sm text-gray-900">{product.category}</p>
+                        <p className="text-sm text-gray-900">{product.categoryId.title}</p>
                       )}
                     </div>
 
@@ -216,7 +190,7 @@ const ProductDetailsModal = ({
                           ))}
                         </select>
                       ) : (
-                        <p className="text-sm text-gray-900">{product.brand}</p>
+                        <p className="text-sm text-gray-900">{product.brandId.title}</p>
                       )}
                     </div>
 
@@ -236,227 +210,16 @@ const ProductDetailsModal = ({
                           />
                         </div>
                       ) : (
-                        <p className="text-sm text-gray-900">${product.price.toFixed(2)}</p>
+                        // <p className="text-sm text-gray-900">${product.price.toFixed(2)}</p>
+                        <p className="text-sm text-gray-900">Npr.{product.price}</p>
                       )}
                     </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700">Supplier</label>
-                    {isEditMode ? (
-                      <input
-                        type="text"
-                        name="supplier"
-                        value={editedProduct.supplier}
-                        onChange={handleChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-[#FFB800] focus:border-[#FFB800]"
-                      />
-                    ) : (
-                      <p className="text-sm text-gray-900">{product.supplier}</p>
-                    )}
                   </div>
                 </div>
               </div>
             </div>
           )}
-
-          {/* Stock Information Tab */}
-          {activeTab === "stock" && (
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <h3 className="font-medium text-gray-900">Current Stock</h3>
-
-                  <div className="bg-gray-50 rounded-lg p-4 space-y-4">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <p className="text-sm text-gray-500">Current Stock Level</p>
-                        <div className="flex items-center">
-                          <p className="text-2xl font-bold">
-                            {isEditMode ? (
-                              <input
-                                type="number"
-                                name="stockLevel"
-                                value={editedProduct.stockLevel}
-                                onChange={handleChange}
-                                min="0"
-                                className="w-24 px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-[#FFB800] focus:border-[#FFB800]"
-                              />
-                            ) : (
-                              product.stockLevel
-                            )}
-                          </p>
-                          <p className="ml-2 text-gray-500">Units</p>
-                        </div>
-                      </div>
-                      <div>{getStatusBadge(isEditMode ? editedProduct.status : product.status)}</div>
-                    </div>
-
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <p className="text-sm text-gray-500">Minimum Stock Level</p>
-                        <div className="flex items-center">
-                          <p className="text-lg font-medium">
-                            {isEditMode ? (
-                              <input
-                                type="number"
-                                name="minStockLevel"
-                                value={editedProduct.minStockLevel}
-                                onChange={handleChange}
-                                min="0"
-                                className="w-24 px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-[#FFB800] focus:border-[#FFB800]"
-                              />
-                            ) : (
-                              product.minStockLevel
-                            )}
-                          </p>
-                          <p className="ml-2 text-gray-500">Units</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div>
-                      <p className="text-sm text-gray-500">Last Restocked</p>
-                      <p className="text-base">{formatDate(product.lastRestocked)}</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <h3 className="font-medium text-gray-900">Warehouse Information</h3>
-
-                  <div className="bg-gray-50 rounded-lg p-4 space-y-4">
-                    <div>
-                      <p className="text-sm text-gray-500">Warehouse Location</p>
-                      {isEditMode ? (
-                        <select
-                          name="warehouse"
-                          value={editedProduct.warehouse}
-                          onChange={handleChange}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-[#FFB800] focus:border-[#FFB800]"
-                        >
-                          {warehouses.map((warehouse) => (
-                            <option key={warehouse.id} value={warehouse.id}>
-                              {warehouse.name}
-                            </option>
-                          ))}
-                        </select>
-                      ) : (
-                        <p className="text-base font-medium">{getWarehouseName(product.warehouse)}</p>
-                      )}
-                    </div>
-
-                    <div>
-                      <p className="text-sm text-gray-500">Shelf Location</p>
-                      {isEditMode ? (
-                        <input
-                          type="text"
-                          name="shelfLocation"
-                          value={editedProduct.shelfLocation || ""}
-                          onChange={handleChange}
-                          placeholder="e.g., A12-B3"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-[#FFB800] focus:border-[#FFB800]"
-                        />
-                      ) : (
-                        <p className="text-base">{product.shelfLocation || "Not specified"}</p>
-                      )}
-                    </div>
-                  </div>
-
-                  {!isEditMode && (
-                    <div className="mt-4">
-                      <button
-                        onClick={onRestock}
-                        className="w-full px-4 py-2 bg-[#FFB800] text-black font-medium rounded-lg hover:bg-[#FFB800]/90 transition-colors"
-                      >
-                        <PlusCircleIcon className="w-5 h-5 inline mr-2" />
-                        Restock Product
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Stock History Tab */}
-          {activeTab === "history" && (
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <h3 className="font-medium text-gray-900">Stock Movement History</h3>
-              </div>
-
-              {/* This would typically be populated with actual stock movement data */}
-              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th
-                        scope="col"
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                      >
-                        Date
-                      </th>
-                      <th
-                        scope="col"
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                      >
-                        Type
-                      </th>
-                      <th
-                        scope="col"
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                      >
-                        Quantity
-                      </th>
-                      <th
-                        scope="col"
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                      >
-                        Warehouse
-                      </th>
-                      <th
-                        scope="col"
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                      >
-                        User
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {/* Sample stock movement data - in a real app, this would be fetched */}
-                    <tr>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Mar 8, 2025</td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <Badge color="green">Restock</Badge>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">+20 Units</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Main Warehouse</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">John Doe</td>
-                    </tr>
-                    <tr>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Mar 5, 2025</td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <Badge color="red">Removal</Badge>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">-5 Units</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Main Warehouse</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Jane Smith</td>
-                    </tr>
-                    <tr>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Mar 1, 2025</td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <Badge color="blue">Transfer</Badge>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">-10 Units</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">East Coast Facility</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">John Doe</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
+  
         </div>
 
         <div className="flex justify-end gap-3 border-t border-gray-200 px-6 py-4">

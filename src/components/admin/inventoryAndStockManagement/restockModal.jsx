@@ -37,23 +37,23 @@ const RestockModal = ({ product, onClose, onRestock, warehouses }) => {
                     <p className="text-sm text-gray-500">Product Name</p>
                     <p className="font-medium">{product.name}</p>
                   </div>
-                  <div>
+                  {/* <div>
                     <p className="text-sm text-gray-500">SKU</p>
                     <p className="font-medium">{product.sku}</p>
-                  </div>
+                  </div> */}
                   <div>
                     <p className="text-sm text-gray-500">Category</p>
                     <p className="font-medium">
-                      {product.category} &gt; {product.subcategory}
+                      {product.categoryId.title} &gt; {product.subcategory}
                     </p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Brand</p>
-                    <p className="font-medium">{product.brand}</p>
+                    <p className="font-medium">{product.brandId.title}</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Current Stock</p>
-                    <p className="font-medium">{product.stockLevel} Units</p>
+                    <p className="font-medium">{product.stock} Units</p>
                   </div>
                 </div>
               </div>
@@ -76,22 +76,6 @@ const RestockModal = ({ product, onClose, onRestock, warehouses }) => {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700">Warehouse Location*</label>
-                    <select
-                      value={warehouseId}
-                      onChange={(e) => setWarehouseId(e.target.value)}
-                      required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-[#FFB800] focus:border-[#FFB800]"
-                    >
-                      {warehouses.map((warehouse) => (
-                        <option key={warehouse.id} value={warehouse.id}>
-                          {warehouse.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="space-y-2">
                     <label className="block text-sm font-medium text-gray-700">Restock Date*</label>
                     <input
                       type="date"
@@ -103,7 +87,7 @@ const RestockModal = ({ product, onClose, onRestock, warehouses }) => {
                   </div>
                 </div>
 
-                <div className="space-y-2">
+                {/* <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700">Supplier Notes (Optional)</label>
                   <textarea
                     value={supplierNotes}
@@ -112,7 +96,7 @@ const RestockModal = ({ product, onClose, onRestock, warehouses }) => {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-[#FFB800] focus:border-[#FFB800]"
                     placeholder="Enter any notes about the supplier or delivery"
                   ></textarea>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>

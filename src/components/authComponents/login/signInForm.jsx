@@ -1,50 +1,56 @@
-import { useState } from "react"
-import { Link } from "react-router-dom"
-import { LogIn, ArrowRight } from "lucide-react"
-import { FormInput } from "./formInput"
-import { PasswordInput } from "./passwordInput"
-import { SocialLogin } from "./socialLogin"
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { LogIn, ArrowRight } from "lucide-react";
+import { FormInput } from "./formInput";
+import { PasswordInput } from "./passwordInput";
+import { SocialLogin } from "./socialLogin";
 
 export const SignInForm = ({ loginMethod, onSubmit }) => {
-  const [rememberMe, setRememberMe] = useState(false)
+  const [rememberMe, setRememberMe] = useState(false);
   const [formData, setFormData] = useState({
-    identifier:  "",
+    identifier: "",
     password: "",
-  })
-  const [error, setError] = useState("")
+  });
+  const [error, setError] = useState("");
 
   const handleInputChange = (e) => {
-    let value = e.target.value
+    let value = e.target.value;
 
-    setFormData({ ...formData, identifier: value })
-  }
+    setFormData({ ...formData, identifier: value });
+  };
 
   const handleSubmit = (e) => {
-    console.log(formData)
-    e.preventDefault()
+    console.log(formData);
+    e.preventDefault();
     if (!formData.identifier || !formData.password) {
-      setError("Please fill in all fields.")
-      return
+      setError("Please fill in all fields.");
+      return;
     }
-    setError("")
-    onSubmit(formData)
-  }
+    setError("");
+    onSubmit(formData);
+  };
 
   const handleGoogleLoginSuccess = (response) => {
-    console.log("Google login successful", response)
+    console.log("Google login successful", response);
     // Send response to backend for further auth
-  }
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {error && <p className="text-red-500 text-sm text-center animate-bounce">{error}</p>}
+      {error && (
+        <p className="text-red-500 text-sm text-center animate-bounce">
+          {error}
+        </p>
+      )}
 
       {/* Email/Phone Input */}
       <FormInput
         id="identifier"
         type={loginMethod === "email" ? "email" : "tel"}
         label={loginMethod === "email" ? "Email Address" : "Phone Number"}
-        placeholder={loginMethod === "email" ? "Enter your email" : "+977 XXXXXXXX"}
+        placeholder={
+          loginMethod === "email" ? "Enter your email" : "+977 XXXXXXXX"
+        }
         value={formData.identifier}
         onChange={handleInputChange}
         required
@@ -71,7 +77,11 @@ export const SignInForm = ({ loginMethod, onSubmit }) => {
           />
           Remember me
         </label>
-        <Link to="/forgot-password" className="text-yellow-500 hover:text-yellow-600 transition">
+        <Link
+          to="/request-reset-password"
+          // to="/reset-password/:token"
+          className="text-yellow-500 hover:text-yellow-600 transition"
+        >
           Forgot password?
         </Link>
       </div>
@@ -96,10 +106,14 @@ export const SignInForm = ({ loginMethod, onSubmit }) => {
 
       {/* Sign Up Link */}
       <div className="text-center mt-4">
-        <Link to="/sign-up" className="text-gray-800 hover:text-yellow-500 font-medium transition-all">
-          New user? Create an account <ArrowRight className="w-4 h-4 inline-block" />
+        <Link
+          to="/sign-up"
+          className="text-gray-800 hover:text-yellow-500 font-medium transition-all"
+        >
+          New user? Create an account{" "}
+          <ArrowRight className="w-4 h-4 inline-block" />
         </Link>
       </div>
     </form>
-  )
-}
+  );
+};

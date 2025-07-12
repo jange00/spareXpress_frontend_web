@@ -38,8 +38,8 @@ export const router = createBrowserRouter([
 ,
     errorElement: <NotFound />,
     children: [
-      // { path: "/", element: <ProtectedRoute requiredRole="Customer"><LandingPage /></ProtectedRoute> },
-      { path: "/", element:<LandingPage/>},
+      { path: "/", element: <ProtectedRoute requiredRole="Customer"><LandingPage /></ProtectedRoute> },
+      // { path: "/", element:<LandingPage/>},
       { path: "/sign-in", element: <SignInPage /> },
       { path: "/request-reset-password", element: <RequestResetPasswordPage /> },
       { path: "/reset-password/:token", element: <ResetPasswordPage /> },

@@ -122,7 +122,7 @@ const UserActions = ({
             <ShoppingCart className="w-6 h-6" />
             {/* Cart Item Count Badge */}
             {getTotalItemCount() > 0 && (
-              <span className="absolute -top-2 -right-2 bg-[#ffc107] text-[#212121] text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center min-w-[20px] shadow-md">
+              <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center min-w-[20px] shadow-md">
                 {getTotalItemCount()}
               </span>
             )}

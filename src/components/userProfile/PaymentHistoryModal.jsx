@@ -1,25 +1,32 @@
 import React from "react";
 import { useGetPaymentByUserId } from "../../hook/admin/usePayment/useGetPaymentByUserId";
 
-const PaymentHistoryModal = ({ onClose }) => {
-  const {data: fetchPayment = [] } = useGetPaymentByUserId();
+// Step 1: Accept `userId` as a prop
+const PaymentHistoryModal = ({ userId, onClose }) => {
+  // Step 2: Pass the received `userId` to the hook
+  const { data: fetchPayment = [], isLoading, error } = useGetPaymentByUserId(userId);
 
-  const dummyPayments = [
-    {
-      _id: "1",
-      amount: 2500,
-      paymentMethod: "Credit Card",
-      paymentStatus: "Completed",
-      createdAt: "2025-07-09T10:00:00Z",
-    },
-    {
-      _id: "2",
-      amount: 1700,
-      paymentMethod: "Esewa",
-      paymentStatus: "Pending",
-      createdAt: "2025-07-08T14:30:00Z",
-    },
-  ];
+  // Note: The dummyPayments array is no longer needed as we are fetching real data.
+
+  if (isLoading) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
+        <div className="bg-white rounded-xl w-full max-w-3xl p-6 shadow-xl text-center">
+          <p className="text-lg font-semibold">Loading payment history...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
+        <div className="bg-white rounded-xl w-full max-w-3xl p-6 shadow-xl text-center">
+          <p className="text-lg font-semibold text-red-600">Failed to load payments.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
@@ -33,32 +40,40 @@ const PaymentHistoryModal = ({ onClose }) => {
             ✖
           </button>
         </div>
-        <div className="space-y-4 max-h-[60vh] overflow-y-auto">
+        <div className="space-y-4 max-h-[60vh] overflow-y-auto p-1">
+          {/* Step 3: Add a message for when there are no payments */}
+          {fetchPayment.length === 0 && !isLoading && (
+            <div className="text-center text-gray-500 py-8">
+              You have no payment history.
+            </div>
+          )}
+
           {fetchPayment.map((payment) => (
             <div
               key={payment._id}
-              className="p-4 bg-gray-50 rounded-md border border-gray-200 shadow-sm"
+              className="p-4 bg-gray-50 rounded-lg border border-gray-200 shadow-sm"
             >
-              <div className="flex justify-between items-center mb-2">
-                <div className="font-semibold text-gray-700">
-                  {payment.paymentMethod}
+              <div className="flex justify-between items-start mb-2">
+                <div>
+                    <p className="font-semibold text-gray-700">{payment.paymentMethod}</p>
+                    <p className="text-xs text-gray-400 mt-1">Payment ID: {payment._id}</p>
                 </div>
-                <div
-                  className={`text-sm font-medium ${
-                    payment.paymentStatus === "Completed"
-                      ? "text-green-600"
-                      : payment.paymentStatus === "Pending"
-                      ? "text-yellow-600"
-                      : "text-red-600"
-                  }`}
-                >
-                  {payment.paymentStatus}
+                <div className="text-right">
+                    <p className="font-semibold text-lg text-gray-800">Rs. {payment.amount}</p>
+                    <div
+                      className={`text-xs mt-1 px-2 py-0.5 rounded-full inline-block ${
+                        payment.paymentStatus === "Completed"
+                          ? "bg-green-100 text-green-700"
+                          : payment.paymentStatus === "Pending"
+                          ? "bg-yellow-100 text-yellow-700"
+                          : "bg-red-100 text-red-700"
+                      }`}
+                    >
+                      {payment.paymentStatus}
+                    </div>
                 </div>
               </div>
-              <div className="text-sm text-gray-500">
-                Amount: NPR {payment.amount}
-              </div>
-              <div className="text-xs text-gray-400">
+              <div className="text-xs text-gray-500 border-t pt-2 mt-2">
                 Date: {new Date(payment.createdAt).toLocaleString()}
               </div>
             </div>

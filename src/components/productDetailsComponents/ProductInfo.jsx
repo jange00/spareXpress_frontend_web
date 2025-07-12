@@ -3,7 +3,7 @@ import { Star, ShoppingCart, Heart, Share2, Plus, Minus, Check } from "lucide-re
 import { Link } from "react-router-dom"
 import { usePostCart } from "../../hook/admin/useCart/usePostCart"
 
-export default function ProductInfo({ product, onBuyNow }) {
+export default function   ProductInfo({ product, onBuyNow }) {
   console.log(product?._id)
   const [quantity, setQuantity] = useState(1)
 

@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import React, { useState, useRef } from "react";
 import {
   ChevronDown,
   Home,
@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { useGetAdminUserById } from "../../hook/admin/useUsers/useGetAdminUserByid";
 import ChangePasswordModal from "../userProfile/ChangePasswordModal";
-import OrderHistoryModal from "../userProfile/OrderHistoryModal"; 
+import OrderHistoryModal from "../userProfile/OrderHistoryModal";
 import PaymentHistoryModal from "../userProfile/PaymentHistoryModal";
 import { useNavigate } from "react-router";
 
@@ -23,11 +23,11 @@ const profileOptions = [
 ];
 
 const ProfileOptions = () => {
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showOrderModal, setShowOrderModal] = useState(false);
-  const [showPaymentModal, setShowPaymentModal] = useState(false); 
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
 
   const dropdownRef = useRef(null);
   const storedUserid = localStorage.getItem("userid");
@@ -49,9 +49,9 @@ const ProfileOptions = () => {
       setShowOrderModal(true);
     } else if (label === "Payment History") {
       setShowPaymentModal(true);
-    }else if (label === "Home") {
-      window.location.href = "/"
-    }else {
+    } else if (label === "Home") {
+      window.location.href = "/";
+    } else {
       alert(`Clicked: ${label}`);
     }
 
@@ -123,12 +123,22 @@ const ProfileOptions = () => {
         <ChangePasswordModal onClose={() => setShowPasswordModal(false)} />
       )}
 
+      {/* 
+        ============================================================
+        THE FIX: Pass the `storedUserid` as a prop to the modal.
+        ============================================================
+      */}
       {showOrderModal && (
-        <OrderHistoryModal onClose={() => setShowOrderModal(false)} />
+        <OrderHistoryModal
+          userId={storedUserid}
+          onClose={() => setShowOrderModal(false)}
+        />
       )}
 
       {showPaymentModal && (
-        <PaymentHistoryModal onClose={() => setShowPaymentModal(false)} />
+        <PaymentHistoryModal 
+        // userId={storedUserid}
+        onClose={() => setShowPaymentModal(false)} />
       )}
     </>
   );

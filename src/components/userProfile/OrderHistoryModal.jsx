@@ -1,13 +1,42 @@
 import React from "react";
-import { useGetOrdersByUserId } from "../../hook/admin/useOrder/useGetOrdersByUserId";
-// import { useGetAllOrder } from "../../hook/admin/useOrder/useGetAllOrder";
+import { useGetOrdersByUserId} from "../../hook/admin/useOrder/useGetOrdersByUserId"
 
-const OrderHistoryModal = ({ onClose }) => {
-  const { data : fetchOrder = [] } = useGetOrdersByUserId();
-  // const { data : fetchOrders = [] } = useGetAllOrder();
+// Step 1: Accept `userId` as a prop
+const OrderHistoryModal = ({ userId, onClose }) => {
+  console.log('userId received by Modal:', userId); 
+  // Step 2: Pass the `userId` to the hook
+  const { data: fetchOrder = [], isLoading, error } = useGetOrdersByUserId(userId);
+  console.log({
+    hook_userId_param: userId,
+    hook_isLoading: isLoading,
+    hook_error: error,
+    hook_data: fetchOrder
+  });
+
   const handleCancelOrder = (orderId) => {
     alert(`Cancel requested for order: ${orderId}`);
   };
+
+  // Good Practice: Handle loading and error states
+  if (isLoading) {
+    return (
+      <div className="fixed inset-0 z-50 backdrop-blur-sm p-4 flex items-center justify-center">
+        <div className="bg-white w-full max-w-3xl rounded-xl p-6 text-center">
+          <p className="text-lg font-semibold">Loading order history...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+     return (
+      <div className="fixed inset-0 z-50 backdrop-blur-sm p-4 flex items-center justify-center">
+        <div className="bg-white w-full max-w-3xl rounded-xl p-6 text-center">
+          <p className="text-lg font-semibold text-red-600">Failed to load orders.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 z-50  backdrop-blur-sm p-4 flex items-center justify-center">
@@ -21,6 +50,11 @@ const OrderHistoryModal = ({ onClose }) => {
             ✖
           </button>
         </div>
+        
+        {/* Good Practice: Handle case where there are no orders */}
+        {fetchOrder.length === 0 && !isLoading && (
+          <p className="text-center text-gray-500 py-8">You have no past orders.</p>
+        )}
 
         {fetchOrder.map((order) => (
           <div
@@ -30,7 +64,8 @@ const OrderHistoryModal = ({ onClose }) => {
             <div className="flex justify-between mb-2">
               <div>
                 <p className="text-sm text-gray-500">Order ID: {order._id}</p>
-                <p className="text-gray-700 font-medium">Date: {order.createdAt}</p>
+                {/* Improvement: Format the date */}
+                <p className="text-gray-700 font-medium">Date: {new Date(order.createdAt).toLocaleDateString()}</p>
               </div>
               <div className="text-right">
                 <p className="text-sm font-semibold text-gray-700">

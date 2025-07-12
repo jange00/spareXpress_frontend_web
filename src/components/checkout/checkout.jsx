@@ -23,11 +23,14 @@ import {
   availableProducts,
 } from "./sampleData"
 import { calculateOrderSummary } from "./calculations"
+import { usePostOrder } from "../../hook/admin/useOrder/usePostOrder";
 
 const CheckoutPage = () => {
+  const {mutate} = usePostOrder()
   // Main checkout state
   const location = useLocation();
 const { productData, quantity } = location.state || {};
+
 
 const initialCart = productData
   ? [{ ...productData, id: productData._id || productData.id, quantity }]
@@ -110,6 +113,26 @@ const [cartItems, setCartItems] = useState(initialCart);
     setCvvConfirmation("")
     setCvvError("")
   }
+  const handlePlaceOrder = () => {
+    if (!selectedAddress?._id || cartItems.length === 0) {
+      alert("Address and cart items required");
+      return;
+    }
+
+    const orderPayload = {
+      Amount: Number(orderSummary.total),
+      shippingAddressId: selectedAddress._id,
+      items: cartItems.map((item) => ({
+        productId: item._id || item.productId || item.id,
+        quantity: item.quantity || 1,
+        total:orderSummary.total
+      })),
+    };
+     
+    console.log(orderPayload)
+
+    mutate(orderPayload);
+  };
 
   const handleApplyCoupon = (code) => {
     const coupon = coupons.find((c) => c.code === code)
@@ -226,6 +249,7 @@ const [cartItems, setCartItems] = useState(initialCart);
       })
     
       document.body.appendChild(form)
+       handlePlaceOrder();
       form.submit()
     }
 
@@ -244,11 +268,13 @@ const [cartItems, setCartItems] = useState(initialCart);
     }
     if (selectedPayment.type === "khalti" ) {
       handleKhaltiPayment()
+
       // setCvvError("Please enter your CVV to confirm payment")
       return
     }
     if (selectedPayment.type === "esewa" ) {
       handleEsewaPayment()
+      handlePlaceOrder()
       // setCvvError("Please enter your CVV to confirm payment")
       return
     }

@@ -1,7 +1,14 @@
 export const calculateOrderSummary = (cartItems, selectedShipping, appliedCoupon) => {
+  console.log(cartItems)
     // Calculate subtotal from all cart items
-    const subtotal = cartItems.reduce((total, item) => total + (item.price-(item.price-(item.discount))), 0)
+    const subtotal = cartItems.reduce((total, item) => {
+      const price = item.price || item.productId?.price || 0
+      const quantity = item.quantity || 1
+      const itemDiscount = item.discount || 0 // percentage
   
+      const discountedPrice = price - (price * itemDiscount / 100)
+      return total + discountedPrice * quantity
+    }, 0)
     // Apply coupon discount if available
     let discount = 0
     if (appliedCoupon) {

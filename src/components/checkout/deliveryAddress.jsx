@@ -78,15 +78,15 @@ export const DeliveryAddress = ({
               ) : (
                 addresses.map((address) => (
                   <div
-                    key={address.id}
+                    key={address._id}
                     className={`border ${
-                      selectedAddress?.id === address.id
+                      selectedAddress?._id === address._id
                         ? "border-[#FFB800]"
                         : "border-gray-200"
                     } rounded-lg p-4 mb-3 relative cursor-pointer`}
                     onClick={() => onAddressSelect(address)}
                   >
-                    {selectedAddress?.id === address.id && (
+                    {selectedAddress?._id === address._id && (
                       <div className="absolute top-4 right-4">
                         <CheckCircle className="w-5 h-5 text-[#FFB800]" />
                       </div>

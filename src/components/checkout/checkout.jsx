@@ -10,6 +10,8 @@ import { PaymentMethodComponent } from "./paymentMethod"
 import { CouponSection } from "./couponSection"
 import { SuccessPage } from "./successPage"
 import { AddItemsModal } from "./addItemsModal"
+import CryptoJS from "crypto-js";
+import {v4 as uuidv4} from "uuid"
 
 // Import data and utilities
 import {
@@ -183,7 +185,54 @@ const [cartItems, setCartItems] = useState(initialCart);
        
     };
 
+    const handleEsewaPayment = () => {
+      // setIsProcessing(true)
+    
+      const transaction_uuid = uuidv4(); // or use uuid v4 if required
+      console.log(transaction_uuid)
+      const product_code = "EPAYTEST"
+      const total_amount = cartItems[0].price.toFixed(2) // You must match this exactly as in the string
+      const signed_field_names = "total_amount,transaction_uuid,product_code"
+    
+      const signingString = `total_amount=${total_amount},transaction_uuid=${transaction_uuid},product_code=${product_code}`
+      const secret = "8gBm/:&EnhH.1/q" // ← UAT secret key from eSewa. DO NOT USE IN PRODUCTION FRONTEND.
+    
+      const signature = CryptoJS.HmacSHA256(signingString, secret).toString(CryptoJS.enc.Base64)
+    
+      const fields = {
+        amount: cartItems[0].price.toFixed(2),
+        tax_amount: "0",
+        total_amount: total_amount,
+        transaction_uuid: transaction_uuid,
+        product_code: product_code,
+        product_service_charge: "0",
+        product_delivery_charge: "0",
+        success_url: "https://developer.esewa.com.np/success",
+        failure_url: "https://developer.esewa.com.np/failure",
+        signed_field_names: signed_field_names,
+        signature: signature,
+      }
+    
+      const form = document.createElement("form")
+      form.setAttribute("method", "POST")
+      form.setAttribute("action", "https://rc-epay.esewa.com.np/api/epay/main/v2/form")
+    
+      Object.entries(fields).forEach(([key, value]) => {
+        const input = document.createElement("input")
+        input.setAttribute("type", "hidden")
+        input.setAttribute("name", key)
+        input.setAttribute("value", value)
+        form.appendChild(input)
+      })
+    
+      document.body.appendChild(form)
+      form.submit()
+    }
+
+    
+
   const handleCheckout = () => {
+    console.log(selectedPayment.type)
     if (cartItems.length === 0) {
       alert("Your cart is empty")
       return
@@ -195,6 +244,11 @@ const [cartItems, setCartItems] = useState(initialCart);
     }
     if (selectedPayment.type === "khalti" ) {
       handleKhaltiPayment()
+      // setCvvError("Please enter your CVV to confirm payment")
+      return
+    }
+    if (selectedPayment.type === "esewa" ) {
+      handleEsewaPayment()
       // setCvvError("Please enter your CVV to confirm payment")
       return
     }

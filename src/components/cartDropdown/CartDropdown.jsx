@@ -5,16 +5,29 @@ import { CartContent } from "./cartContent"
 import { SavedItemsContent } from "./savedItemsContent"
 import { Notification } from "./notification"
 
+import { useGetCartByUserId } from "../../hook/admin/useCart/useGetCartByUserId"
+
 const CartDropdown = ({ isOpen, onClose, cartItems = [], onQuantityChange, onRemoveItem }) => {
+  const { data: cart = [], refetch } = useGetCartByUserId();
   const [isVisible, setIsVisible] = useState(isOpen)
   const [activeTab, setActiveTab] = useState("cart")
   const [savedItems, setSavedItems] = useState([])
   const dropdownRef = useRef(null)
   const [showNotification, setShowNotification] = useState(false)
   const [notificationMessage, setNotificationMessage] = useState("")
+  useEffect(() => {
+    if (isOpen) {
+      refetch(); // ✅ manually fetch when cart is opened
+    }
+  }, [isOpen, refetch]);
+  
+  console.log("Fetched cart data:", cart);
+  
+  
 
   // Handle outside clicks
   useEffect(() => {
+    
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         onClose()
@@ -81,12 +94,15 @@ const CartDropdown = ({ isOpen, onClose, cartItems = [], onQuantityChange, onRem
     }, 3000)
   }
 
+  
   const handleQuantityChange = (id, newQuantity) => {
     if (newQuantity < 1) return
-    if (onQuantityChange) {
-      onQuantityChange(id, newQuantity)
-      displayNotification("Quantity updated")
-    }
+
+    const updatedCart = cartItemsState.map((item) =>
+      item._id === id ? { ...item, quantity: newQuantity } : item
+    )
+    setCartItemsState(updatedCart)
+    displayNotification("Quantity updated")
   }
 
   const handleRemoveItem = (id) => {
@@ -119,7 +135,7 @@ const CartDropdown = ({ isOpen, onClose, cartItems = [], onQuantityChange, onRem
 
         {activeTab === "cart" && (
           <CartContent
-            cartItems={cartItems}
+            cartItems={cart}
             onQuantityChange={handleQuantityChange}
             onRemoveItem={handleRemoveItem}
             onSaveForLater={handleSaveForLater}

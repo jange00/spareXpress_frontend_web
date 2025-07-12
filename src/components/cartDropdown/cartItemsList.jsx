@@ -20,7 +20,7 @@ export const CartItemsList = ({ cartItems, onQuantityChange, onRemoveItem, onSav
     <div className="space-y-4">
       {cartItems.map((item) => (
         <CartItem
-          key={item.id}
+          key={item._id}
           item={item}
           onQuantityChange={onQuantityChange}
           onRemoveItem={onRemoveItem}

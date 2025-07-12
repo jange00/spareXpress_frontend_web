@@ -73,6 +73,28 @@ export const PaymentMethodComponent = ({
                             </div>
                           </div>
                         )}
+                          {method.type === "khalti" && (
+                          <div className="flex items-center">
+                            <div className="p-1 bg-yellow-50 rounded mr-2">
+                              <DollarSign className="w-5 h-5 text-yellow-600" />
+                            </div>
+                            <div>
+                              <h3 className="font-medium text-gray-900">{method.name}</h3>
+                              <p className="text-sm text-gray-600">{method.description}</p>
+                            </div>
+                          </div>
+                        )}
+                          {method.type === "esewa" && (
+                          <div className="flex items-center">
+                            <div className="p-1 bg-yellow-50 rounded mr-2">
+                              <DollarSign className="w-5 h-5 text-yellow-600" />
+                            </div>
+                            <div>
+                              <h3 className="font-medium text-gray-900">{method.name}</h3>
+                              <p className="text-sm text-gray-600">{method.description}</p>
+                            </div>
+                          </div>
+                        )}
 
                         {method.type === "cod" && (
                           <div className="flex items-center">

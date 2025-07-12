@@ -1,9 +1,19 @@
 import { useState } from "react"
 import { Star, ShoppingCart, Heart, Share2, Plus, Minus, Check } from "lucide-react"
 import { Link } from "react-router-dom"
+import { usePostCart } from "../../hook/admin/useCart/usePostCart"
 
 export default function ProductInfo({ product, onBuyNow }) {
+  console.log(product?._id)
   const [quantity, setQuantity] = useState(1)
+
+  const {mutate}=usePostCart()
+
+  const addtocart=()=>{
+    mutate({"productId":product?._id})
+
+    
+  }
 
   const handleQuantityChange = (change) => {
     const newQuantity = quantity + change
@@ -98,7 +108,7 @@ const discountedPrice = originalPrice - (originalPrice * discount) / 100;
 
       {/* Action Buttons */}
       <div className="flex space-x-4">
-        <button className="flex-1 bg-yellow-500 text-gray-900 py-3 px-6 rounded-lg font-semibold flex items-center justify-center space-x-2 hover:bg-yellow-600 transition-colors">
+        <button onClick={addtocart} className="flex-1 bg-yellow-500 text-gray-900 py-3 px-6 rounded-lg font-semibold flex items-center justify-center space-x-2 hover:bg-yellow-600 transition-colors">
           <ShoppingCart className="w-5 h-5" />
           <span>Add to Cart</span>
         </button>

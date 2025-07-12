@@ -6,10 +6,12 @@ import NavigationMenu from "./navigationMenu"
 import UserActions from "./userActions"
 import MobileMenu from "./mobileMenu"
 import CartDropdown from "../cartDropdown/CartDropdown"
+import { useGetCartByUserId } from "../../hook/admin/useCart/useGetCartByUserId"
 
 // import CartDropdown from "../cartDropdown/cartDropdown"
 
 const TopNavigationBar = () => {
+  const {data: cartItem = [] } = useGetCartByUserId();
   const [searchQuery, setSearchQuery] = useState("")
   const [isVehicleDropdownOpen, setIsVehicleDropdownOpen] = useState(false)
   const [isComputerDropdownOpen, setIsComputerDropdownOpen] = useState(false)
@@ -82,7 +84,7 @@ const TopNavigationBar = () => {
           <UserActions
            isCartOpen={isCartOpen}
            onClose={() => setIsCartOpen(false)}
-           cartItems={cartItems}
+           cartItems={cartItem}
            onQuantityChange={handleQuantityChange}
            onRemoveItem={handleRemoveItem}
            getTotalItemCount={getTotalItemCount}

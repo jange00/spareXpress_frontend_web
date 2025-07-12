@@ -165,6 +165,15 @@ export const paymentMethods = [
     id: "khalti",
     name: "Khalti",
     type: "khalti",
+    walletName: "khalti",
+    isDefault: false,
+    // icon: "/path-to-khalti-logo.png", // optional icon path
+  },
+  {
+    id: "esewa",
+    name: "esewa",
+    type: "esewa",
+    walletName: "esewa",
     isDefault: false,
     // icon: "/path-to-khalti-logo.png", // optional icon path
   },

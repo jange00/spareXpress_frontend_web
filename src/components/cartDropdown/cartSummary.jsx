@@ -1,14 +1,18 @@
 import { ChevronRight, Shield, Clock } from "lucide-react"
 
 export const CartSummary = ({ cartItems, onClose }) => {
-  // Calculate totals
-  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  // Calculate totals based on productId.price and quantity
+  const subtotal = cartItems.reduce((sum, item) => {
+    const price = item?.productId?.price || 0
+    const qty = item?.quantity || 1
+    return sum + price * qty
+  }, 0)
+
   const shipping = subtotal > 50 ? 0 : 5.99
-  const tax = subtotal * 0.08 // 8% tax rate
+  const tax = subtotal * 0.08 // 8% tax
   const total = subtotal + shipping + tax
 
   const handleCheckout = () => {
-    // In a real app, this would navigate to the checkout page
     window.location.href = "/checkout"
   }
 
@@ -17,21 +21,23 @@ export const CartSummary = ({ cartItems, onClose }) => {
       <div className="space-y-2 mb-4">
         <div className="flex justify-between text-sm">
           <span className="text-gray-600">Subtotal:</span>
-          <span className="font-medium">${subtotal.toFixed(2)}</span>
+          <span className="font-medium">Rs.{subtotal.toFixed(2)}</span>
         </div>
         <div className="flex justify-between text-sm">
           <span className="text-gray-600">Shipping:</span>
           <span className="font-medium">
-            {shipping === 0 ? <span className="text-green-600 font-semibold">FREE</span> : `$${shipping.toFixed(2)}`}
+            {shipping === 0
+              ? <span className="text-green-600 font-semibold">FREE</span>
+              : `Rs.${shipping.toFixed(2)}`}
           </span>
         </div>
         <div className="flex justify-between text-sm">
           <span className="text-gray-600">Estimated Tax:</span>
-          <span className="font-medium">${tax.toFixed(2)}</span>
+          <span className="font-medium">Rs.{tax.toFixed(2)}</span>
         </div>
         <div className="flex justify-between text-base pt-2 border-t border-gray-200">
           <span className="font-bold text-[#212121]">Total:</span>
-          <span className="font-bold text-[#212121]">${total.toFixed(2)}</span>
+          <span className="font-bold text-[#212121]">Rs.{total.toFixed(2)}</span>
         </div>
       </div>
 

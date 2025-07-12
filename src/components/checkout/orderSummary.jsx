@@ -23,6 +23,7 @@ export const OrderSummaryComponent = ({
   onContinueShopping,
 }) => {
   const [showProductDetails, setShowProductDetails] = useState(null);
+  console.log(cartItems[0].discount)
 
   const toggleProductDetails = (productId) => {
     setShowProductDetails(showProductDetails === productId ? null : productId);
